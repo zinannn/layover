@@ -23,9 +23,10 @@
   --text:#E9EEEC;
   --muted:#8B9B9C;
   --dim:#5F6E70;
-  --amber:#FFB000;
-  --amber-soft:#3A2A05;
-  --on-amber:#0D1112;
+  --amber:#F76902;        /* RIT Orange - fills and large bold type only */
+  --amber-sm:#F76902;     /* small type: 6.2:1 on this ground, so brand orange holds */
+  --amber-soft:#3A2105;
+  --on-amber:#170B02;
   --go:#3FBFA8;
   --go-soft:#0E2A27;
   --on-go:#06201C;
@@ -38,18 +39,19 @@
   --maxw:1180px;
 }
 :root[data-theme="light"]{
-  --ground:#E7ECEA;
+  --ground:#FFFFFF;
   --surface:#FFFFFF;
-  --surface-2:#F2F5F4;
+  --surface-2:#F1F4F3;
   --board:#12191A;      /* the board stays a board in daylight */
-  --line:#CBD5D2;
-  --line-soft:#DCE4E2;
+  --line:#D5DCDA;
+  --line-soft:#E4EAE8;
   --text:#0F1516;
   --muted:#4E5C5D;
   --dim:#78878A;
-  --amber:#96570A;
-  --amber-soft:#FBEBD0;
-  --on-amber:#FFFFFF;
+  --amber:#F76902;        /* RIT Orange */
+  --amber-sm:#C75300;     /* RIT accessible orange, 4.5:1 on white */
+  --amber-soft:#FDEADB;
+  --on-amber:#170B02;
   --go:#127264;
   --go-soft:#D7EDE9;
   --on-go:#FFFFFF;
@@ -59,15 +61,15 @@
 }
 @media (prefers-color-scheme: light){
   :root:not([data-theme="dark"]){
-    --ground:#E7ECEA; --surface:#FFFFFF; --surface-2:#F2F5F4; --board:#12191A;
-    --line:#CBD5D2; --line-soft:#DCE4E2; --text:#0F1516; --muted:#4E5C5D; --dim:#78878A;
-    --amber:#96570A; --amber-soft:#FBEBD0; --on-amber:#FFFFFF; --go:#127264; --go-soft:#D7EDE9; --on-go:#FFFFFF;
+    --ground:#FFFFFF; --surface:#FFFFFF; --surface-2:#F1F4F3; --board:#12191A;
+    --line:#D5DCDA; --line-soft:#E4EAE8; --text:#0F1516; --muted:#4E5C5D; --dim:#78878A;
+    --amber:#F76902; --amber-sm:#C75300; --amber-soft:#FDEADB; --on-amber:#170B02; --go:#127264; --go-soft:#D7EDE9; --on-go:#FFFFFF;
     --alert:#B23A29; --alert-soft:#F8DFDA;
     --shadow:0 1px 0 rgba(255,255,255,.6), 0 14px 34px -26px rgba(15,30,28,.55);
   }
 }
 /* the board component keeps its own dark palette in both themes */
-.board-scope{ --on-amber:#0D1112; --on-go:#06201C; --text:#E9EEEC; --muted:#8B9B9C; --dim:#5F6E70; --amber:#FFB000; --go:#3FBFA8; --alert:#E8614D; --line:#253033; }
+.board-scope{ --on-amber:#170B02; --on-go:#06201C; --text:#E9EEEC; --muted:#8B9B9C; --dim:#5F6E70; --amber:#F76902; --amber-sm:#F76902; --go:#3FBFA8; --alert:#E8614D; --line:#253033; }
 
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -90,7 +92,7 @@ h3{font-size:1.12rem; letter-spacing:-.015em}
 p{margin:0}
 .eyebrow{
   font-family:var(--font-board); font-size:.62rem; font-weight:600;
-  text-transform:uppercase; letter-spacing:.19em; color:var(--amber);
+  text-transform:uppercase; letter-spacing:.19em; color:var(--amber-sm);
 }
 .eyebrow.q{color:var(--muted)}
 .lede{font-size:clamp(1rem,2.1vw,1.16rem); color:var(--muted); max-width:64ch}
@@ -98,6 +100,20 @@ p{margin:0}
 .prose p{max-width:68ch; color:var(--muted)}
 .prose p + p{margin-top:.9em}
 strong{color:var(--text); font-weight:600}
+
+/* ============ RIT INSTITUTIONAL BAR ============ */
+.ritbar{background:var(--surface-2); border-bottom:1px solid var(--line)}
+.ritbar-in{max-width:var(--maxw); margin:0 auto; padding:8px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap}
+.ritmark{
+  font-family:var(--font-sans); font-weight:700; font-size:1.25rem; line-height:1;
+  letter-spacing:.01em; color:var(--amber);   /* 20px bold: RIT Orange is permitted at this size */
+}
+.ritname{font-size:.76rem; color:var(--muted); letter-spacing:.01em}
+.ritnote{
+  margin-left:auto; font-family:var(--font-board); font-size:.56rem; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--dim);
+}
+@media (max-width:560px){ .ritnote{margin-left:0; width:100%} }
 
 /* ============ TERMINAL BAR ============ */
 .term{
@@ -118,7 +134,7 @@ nav a[aria-current="page"]{color:var(--text); background:var(--surface-2); borde
   font-family:var(--font-board); font-size:.68rem; letter-spacing:.06em; color:var(--muted);
   display:flex; align-items:center; gap:8px; font-variant-numeric:tabular-nums;
 }
-.tick b{color:var(--amber); font-weight:600}
+.tick b{color:var(--amber-sm); font-weight:600}
 .pulse{width:6px;height:6px;border-radius:50%;background:var(--go); box-shadow:0 0 0 0 var(--go); animation:pulse 2.4s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--go) 60%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 .themebtn{background:none;border:1px solid var(--line);color:var(--muted);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:.8rem;display:grid;place-items:center}
@@ -229,7 +245,7 @@ table.brd tbody tr[aria-selected="true"]{background:rgba(255,176,0,.09)}
 .gate.clash{opacity:.62}
 .gate .gh{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
 .gate .code{font-family:var(--font-board); font-size:.6rem; letter-spacing:.16em; color:var(--dim); text-transform:uppercase}
-.gate .when{font-family:var(--font-board); font-size:.84rem; color:var(--amber); font-variant-numeric:tabular-nums; font-weight:600}
+.gate .when{font-family:var(--font-board); font-size:.84rem; color:var(--amber-sm); font-variant-numeric:tabular-nums; font-weight:600}
 .gate p{font-size:.87rem; color:var(--muted); line-height:1.5}
 .gate .meta{font-size:.76rem; color:var(--dim); display:flex; gap:12px; flex-wrap:wrap; font-family:var(--font-board)}
 .cap{height:4px; background:var(--surface-2); border-radius:99px; overflow:hidden}
@@ -244,19 +260,21 @@ table.sched td:first-child{font-family:var(--font-sans); font-weight:600; font-s
 .x:hover{color:var(--alert)}
 
 /* ============ P&S PAGE ============ */
-.ps-num{font-family:var(--font-board); font-size:.62rem; letter-spacing:.18em; color:var(--amber); text-transform:uppercase}
+.ps-num{font-family:var(--font-board); font-size:.62rem; letter-spacing:.18em; color:var(--amber-sm); text-transform:uppercase}
 .quote{border-left:2px solid var(--amber); padding:2px 0 2px 18px; font-size:1.02rem; line-height:1.55; color:var(--text); max-width:62ch; font-style:italic}
 .cite{display:block; font-family:var(--font-board); font-size:.6rem; letter-spacing:.09em; color:var(--dim); font-style:normal; margin-top:9px; text-transform:uppercase}
 .src{font-size:.82rem; color:var(--muted); padding:11px 0; border-bottom:1px solid var(--line-soft); display:grid; grid-template-columns:26px 1fr; gap:12px; align-items:start}
 .src span{font-family:var(--font-board); font-size:.6rem; color:var(--dim); padding-top:3px}
-.src a{color:var(--amber); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--amber) 35%,transparent)}
+.src a{color:var(--amber-sm); text-decoration:none; border-bottom:1px solid color-mix(in srgb,var(--amber) 35%,transparent)}
 .src a:hover{border-bottom-color:var(--amber)}
 .finding{display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start; padding:14px 0; border-bottom:1px solid var(--line-soft)}
 .finding .big{font-family:var(--font-board); font-size:1.35rem; font-weight:600; color:var(--amber); font-variant-numeric:tabular-nums; letter-spacing:-.03em; min-width:96px}
 .finding .txt{font-size:.88rem; color:var(--muted); line-height:1.5}
 ul.clean{margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px}
-ul.clean li{display:grid; grid-template-columns:16px 1fr; gap:10px; font-size:.89rem; color:var(--muted); line-height:1.5}
-ul.clean li::before{content:"—"; color:var(--amber); font-family:var(--font-board); font-size:.7rem; padding-top:4px}
+/* inline flow, not grid: a <strong> inside a grid item becomes its own item and
+   shunts the rest of the sentence into the 16px marker column */
+ul.clean li{position:relative; padding-left:26px; font-size:.89rem; color:var(--muted); line-height:1.5}
+ul.clean li::before{content:"—"; position:absolute; left:0; top:0; color:var(--amber-sm); font-family:var(--font-board); font-size:.7rem; line-height:1.95}
 
 /* ============ HERO ============ */
 .hero{padding-block:34px 8px}
@@ -264,7 +282,11 @@ ul.clean li::before{content:"—"; color:var(--amber); font-family:var(--font-bo
 .mini{font-family:var(--font-board); font-size:.62rem; letter-spacing:.15em; text-transform:uppercase; color:var(--dim)}
 
 footer{border-top:1px solid var(--line); margin-top:40px; padding:26px 20px 60px}
-footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; font-size:.78rem; color:var(--dim)}
+footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:space-between; gap:22px; flex-wrap:wrap; font-size:.78rem; color:var(--dim)}
+footer .fcol{display:flex; flex-direction:column; gap:8px; max-width:62ch}
+footer .fbrand{display:flex; align-items:center; gap:9px; color:var(--muted); font-size:.8rem}
+footer p{line-height:1.55}
+footer strong{color:var(--muted)}
 
 @media (max-width:640px){
   .term-in{min-height:52px; padding-block:8px}
@@ -279,6 +301,14 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
+
+<div class="ritbar">
+  <div class="ritbar-in">
+    <span class="ritmark">RIT</span>
+    <span class="ritname">Rochester Institute of Technology &middot; Dubai &middot; Dubai Silicon Oasis</span>
+    <span class="ritnote">Student project &middot; DesignAthon 2026</span>
+  </div>
+</div>
 
 <header class="term">
   <div class="term-in">
@@ -302,7 +332,7 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
   <div class="hero stack">
     <p class="eyebrow">RIT Dubai · Parking Lot 3 · Departures 15:00 &amp; 18:00</p>
     <h1>Your last class ended at 15:10.<br>The next bus leaves at <span>18:00</span>.</h1>
-    <p class="lede">That's not a break. It's a <strong>layover</strong> — too long to waste, too short to go home, and spent alone because nobody knows who else is stranded in the same window. Layover reads the bus timetable as a social graph and shows you who is grounded with you, right now.</p>
+    <p class="lede">That's not a break. It's a <strong>layover</strong> — too long to waste, too short to go home, and spent alone because nobody knows who else is stranded in the same window. Layover reads the bus timetable as a social graph and shows who is grounded with you, right now.</p>
   </div>
 
   <div class="stack" style="margin-top:30px">
@@ -347,7 +377,7 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
       </div>
       <div id="boardEmpty" class="empty" hidden></div>
     </div>
-    <p class="mini" id="boardNote">Rows are seeded example students so the board is never empty. Your own layover is computed from the schedule in <a href="#/day" style="color:var(--amber)">My Day</a>.</p>
+    <p class="mini" id="boardNote">Rows are seeded example students so the board is never empty. Your own layover is computed from the schedule in <a href="#/day" style="color:var(--amber-sm)">My Day</a>.</p>
   </div>
 
   <div class="stack-lg" style="margin-top:64px">
@@ -483,10 +513,10 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
       <p class="ps-num">01 — The problem</p>
       <h2>Commuter students at RIT Dubai don't have free time. They have <em>stranded</em> time.</h2>
       <div class="prose stack" style="gap:14px; margin-top:6px">
-        <p>RIT Dubai sits in Dubai Silicon Oasis, and most of its students don't live there. They arrive on the university's commuter buses from Al Qusais, Mirdif, Deira, Al Barsha, Sharjah, Ajman and Abu Dhabi — or they drive in through a city where traffic is measurably getting worse.</p>
+        <p>RIT Dubai sits in Dubai Silicon Oasis, and most of its students do not live there. They arrive on the university&rsquo;s commuter buses from Al Qusais, Mirdif, Deira, Al Barsha, Sharjah, Ajman and Abu Dhabi.</p>
         <p>Here is the part almost nobody designs around. The commuter bus has <strong>one arrival in the morning and two departures in the afternoon — 3:00 p.m. and 6:00 p.m.</strong>, from Parking Lot 3. Not "every twenty minutes". Two.</p>
         <p>So a student whose last class ends at 3:10 p.m. does not leave at 3:10 p.m. They leave at 6:00. A student whose first class is at 11:00 a.m. did not arrive at 11:00 — they arrived on the single morning bus. The timetable hands them hours they never chose, at both ends of the day, every week, for four years.</p>
-        <p>That time is not rest and it is not study. It is the worst kind of time: <strong>too long to waste, too short to go home, and almost always spent alone</strong> — because no student can see which of the other 900 people on campus happens to be stranded in the same window.</p>
+        <p>That time is not rest and it is not study. It is the worst kind of time: <strong>too long to waste, too short to go home, and almost always spent alone</strong> — because no student can see who else is stranded in the same window.</p>
       </div>
       <div class="quote" style="margin-top:10px">Without a permanent designated area to call their own, commuter students are left to wander between classes feeling like temporary visitors rather than integral members of the campus community.
         <span class="cite">UIC Commuter Student Sense of Belonging Report</span></div>
@@ -495,15 +525,12 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
     <div class="stack">
       <p class="ps-num">02 — The research</p>
       <h2>What I checked before building anything.</h2>
-      <p class="lede">I started from the university's own published operational data, then went to the literature on commuter students to find out whether the pattern I was seeing locally is a known, measured phenomenon. It is.</p>
+      <p class="lede">Two of these are RIT Dubai&rsquo;s own published operational data, because the mechanism is a published timetable rather than something I had to infer. The third is what the research says the consequence is.</p>
 
       <div style="margin-top:14px">
         <div class="finding"><div class="big">2</div><div class="txt"><strong>Afternoon bus departures per day</strong> — 3:00 p.m. and 6:00 p.m. only, for every Dubai, Sharjah and Ajman route, all leaving from Parking Lot 3. Abu Dhabi runs four drop-offs (12:30, 2:30, 4:30, 6:00) on a separate contract. Morning service is a <em>single</em> arrival time. This is the mechanism that manufactures the dead hours. <em>(RIT Dubai, Parking &amp; Transportation)</em></div></div>
-        <div class="finding"><div class="big">3 hrs</div><div class="txt"><strong>The structural worst case.</strong> A class block ending just after 3:00 p.m. — extremely common with RIT's 50- and 110-minute blocks — puts a student in a three-hour wait for the next departure. Repeated twice a week, that is roughly 170 hours over a four-year degree spent waiting for a bus.</div></div>
-        <div class="finding"><div class="big">9,900</div><div class="txt"><strong>AED per year for the Ajman round trip</strong> (Sharjah 8,260; Al Barsha 8,960; Deira/Karama 7,440; Qusais and Mirdif 6,480; Abu Dhabi AED 850/month). Students are paying four figures a year for a seat, and a large share of the campus hours that seat buys them are hours the timetable chose, not hours they did. <em>(RIT Dubai published 2026–27 fees)</em></div></div>
-        <div class="finding"><div class="big">19.1 min</div><div class="txt"><strong>Average time to drive 10 km in Dubai in 2025</strong>, up from 13.7 minutes in 2024 — a 39% increase in a single year. Driving yourself is not the escape hatch, and one Dubai Silicon Oasis resident reported a 20–25 minute run stretching to 40–45 in term-time traffic. <em>(Khaleej Times / RTA data)</em></div></div>
-        <div class="finding"><div class="big">240 hrs</div><div class="txt"><strong>A one-hour-each-way commute costs a student roughly 240 hours per academic year</strong> — about ten full days — before any waiting on campus is counted. <em>(Queen Mary University of London, commuter engagement research)</em></div></div>
-        <div class="finding"><div class="big">Known</div><div class="txt"><strong>This is a documented equity gap, not a local annoyance.</strong> Commuter students consistently report a lower sense of institutional belonging, spend less time on campus outside class, and have measurably less access to informal peer support, welfare services and societies. Researchers repeatedly record the same phrase from students: having <em>"hours to kill in between classes"</em> with nowhere to be. <em>(UIC; QMUL; NCWIT)</em></div></div>
+        <div class="finding"><div class="big">9,900</div><div class="txt"><strong>AED per year for the Ajman round trip</strong> (Sharjah 8,260; Al Barsha 8,960; Deira/Karama 7,440; Qusais and Mirdif 6,480; Abu Dhabi AED 850/month). A seat is bought by the year, so the hours it strands you for are hours already paid for. <em>(RIT Dubai published 2026&ndash;27 fees)</em></div></div>
+        <div class="finding"><div class="big">&mdash;</div><div class="txt"><strong>The consequence is documented, not local.</strong> Commuter students report a lower sense of institutional belonging, spend less time on campus outside class, and have less access to informal peer support and societies. Researchers record the same phrase from students repeatedly: having <em>&ldquo;hours to kill in between classes&rdquo;</em> with nowhere to be. <em>(UIC; QMUL; NCWIT)</em></div></div>
       </div>
 
       <div class="panel stack" style="gap:10px; margin-top:18px">
@@ -522,10 +549,9 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
         <div>
           <div class="src"><span>01</span><div><a href="https://www.rit.edu/dubai/parking-and-transportation" target="_blank" rel="noopener">RIT Dubai — Parking and Transportation</a> · departure times, route list, 2026–27 fee table, Parking Lot 3 boarding.</div></div>
           <div class="src"><span>02</span><div><a href="https://www.rit.edu/dubai/co-op" target="_blank" rel="noopener">RIT Dubai — Co-op</a> · co-op is a compulsory course for all undergraduates.</div></div>
-          <div class="src"><span>03</span><div><a href="https://www.khaleejtimes.com/uae/transport/dubai-commute-time-increase-2025-more-cars" target="_blank" rel="noopener">Khaleej Times</a> · Dubai 10 km travel time rose to 19.1 minutes in 2025 from 13.7 in 2024.</div></div>
-          <div class="src"><span>04</span><div><a href="https://www.qmul.ac.uk/sbbs/news/research-theme-scholarship/items/how-does-commuting-affect-student-engagement.html" target="_blank" rel="noopener">Queen Mary University of London</a> · commuting and student engagement; the 240-hours-per-year figure.</div></div>
-          <div class="src"><span>05</span><div><a href="https://sa.uic.edu/wp-content/uploads/sites/10/2020/07/Commuter-Student-Sense-of-Belonging-Report-FINAL-March-2020.pdf" target="_blank" rel="noopener">University of Illinois Chicago</a> · Commuter Student Sense of Belonging Report.</div></div>
-          <div class="src"><span>06</span><div><a href="https://ncwit.org/resource/fostering-belonging-commuter-students/" target="_blank" rel="noopener">NCWIT</a> · Fostering belonging for commuter students.</div></div>
+          <div class="src"><span>03</span><div><a href="https://www.qmul.ac.uk/sbbs/news/research-theme-scholarship/items/how-does-commuting-affect-student-engagement.html" target="_blank" rel="noopener">Queen Mary University of London</a> &middot; commuting and student engagement.</div></div>
+          <div class="src"><span>04</span><div><a href="https://sa.uic.edu/wp-content/uploads/sites/10/2020/07/Commuter-Student-Sense-of-Belonging-Report-FINAL-March-2020.pdf" target="_blank" rel="noopener">University of Illinois Chicago</a> · Commuter Student Sense of Belonging Report.</div></div>
+          <div class="src"><span>05</span><div><a href="https://ncwit.org/resource/fostering-belonging-commuter-students/" target="_blank" rel="noopener">NCWIT</a> · Fostering belonging for commuter students.</div></div>
         </div>
       </div>
     </div>
@@ -560,7 +586,8 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
           <li><strong>Quiet Gate</strong> is a first-class feature, not an afterthought: co-presence with an explicit no-conversation norm, for students who find unstructured social time costly rather than restorative.</li>
           <li>Every gate publishes its <strong>exact location and window</strong> up front, so a student with a mobility need or limited energy can judge the walk before committing, rather than discovering it on arrival.</li>
           <li>The board is a real HTML table with proper headers, works entirely by keyboard, and every status is carried by text as well as colour — nothing depends on distinguishing amber from green.</li>
-          <li>Both a light and a dark theme are designed and tested, and all motion is disabled automatically under <span class="mono" style="font-size:.8rem">prefers-reduced-motion</span>.</li>
+          <li>Colour follows RIT&rsquo;s published brand rule rather than approximating it: RIT Orange <span class="mono" style="font-size:.8rem">#F76902</span> is used only for fills and type at 18.76px bold or larger, and RIT&rsquo;s accessible orange <span class="mono" style="font-size:.8rem">#C75300</span> carries everything smaller.</li>
+          <li>Both a light and a dark theme are designed, and all motion is disabled automatically under <span class="mono" style="font-size:.8rem">prefers-reduced-motion</span>.</li>
           <li>No account, no upload, no server: everything runs and persists in the browser, which also means nobody's timetable leaves their own device.</li>
         </ul>
       </div>
@@ -570,10 +597,10 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
       <p class="ps-num">04 — Why it matters</p>
       <h2>The hours are already paid for. Right now they're just lost.</h2>
       <div class="prose stack" style="gap:14px; margin-top:6px">
-        <p>A student on the Ajman route pays <strong>AED 9,900 a year</strong> for a seat on a bus that leaves at 3:00 and 6:00. The hours that seat buys them on campus are not optional — they are going to be spent on campus either way. The only open question is whether those hours are spent sitting in a corridor with a phone, or doing something a student actually chose.</p>
-        <p>That difference compounds. The research is consistent: the students who lose this time are the same students who show lower institutional belonging, weaker peer networks, and less access to exactly the informal support that decides who feels able to ask for help, who hears about a co-op opening, and who quietly disengages. At RIT Dubai, where co-op is compulsory and the network you build in second year shapes the placement you land, the stakes are not social — they're structural.</p>
-        <p>And the fix does not need a new building, a new budget line, or a change to the bus contract. The time already exists. The people are already in the same 129,000 m² campus. The only missing piece is the one thing a timetable can't tell you on its own: <strong>who else is here, and for how much longer.</strong></p>
-        <p style="color:var(--text)">Layover is the smallest possible intervention on the largest unclaimed resource on a commuter campus — and it starts working the moment two students' dead hours overlap.</p>
+        <p>A student on the Ajman route pays <strong>AED 9,900 a year</strong> for a seat on a bus that leaves at 3:00 and 6:00. Those campus hours are not optional; they will be spent either way. The only open question is whether they are spent sitting in a corridor or doing something the student chose.</p>
+        <p>The students who lose this time are the same students the research finds with weaker peer networks and less access to informal support &mdash; the support that decides who hears about a co-op opening and who feels able to ask for help. At RIT Dubai, where co-op is compulsory, that is not only a social loss.</p>
+        <p>And the fix does not need a new building, a new budget line, or a change to the bus contract. The time already exists and the people are already on the same campus. The only missing piece is the one thing a timetable cannot tell you on its own: <strong>who else is here, and for how much longer.</strong></p>
+        <p style="color:var(--text)">Layover needs no new building, no new budget and no change to the bus contract. It starts working the moment two students&rsquo; dead hours overlap.</p>
       </div>
     </div>
 
@@ -584,7 +611,12 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
 
 <footer>
   <div class="fi">
-    <span>Layover · DesignAthon 2026 · GDC RIT Dubai × +TWE · #designathon2026</span>
+    <div class="fcol">
+      <p class="fbrand"><span class="ritmark">RIT</span> Rochester Institute of Technology &middot; Dubai</p>
+      <p>Layover is a <strong>student project</strong> submitted to DesignAthon 2026, hosted by GDC RIT Dubai in partnership with +TWE. It is not an official RIT service and is not operated by RIT Dubai&rsquo;s transport office.</p>
+      <p>Route names, departure times and fares are taken from RIT Dubai&rsquo;s published Parking &amp; Transportation page. Interface colours follow RIT&rsquo;s brand palette: RIT Orange #F76902 for fills and large bold type, accessible orange #C75300 for smaller text.</p>
+      <p>#designathon2026</p>
+    </div>
     <span class="mono" id="footClock">—</span>
   </div>
 </footer>
@@ -782,7 +814,7 @@ function renderBoard(){
     f1.innerHTML='<span class="b-time">'+m2s(x.w.b)+'</span><div class="b-sub">'+dur(x.w.b-t)+' left · '+kind+'</div>'; c1.appendChild(f1);
 
     var c2=el("td"); var f2=el("span","flap"); f2.style.animationDelay=(i*26+10)+"ms";
-    f2.innerHTML='<span class="b-name">'+x.p.n+'</span><div class="b-sub">'+x.p.m+(x.shares?' · <span style="color:#FFB000">shares '+x.shares+'</span>':'')+'</div>'; c2.appendChild(f2);
+    f2.innerHTML='<span class="b-name">'+x.p.n+'</span><div class="b-sub">'+x.p.m+(x.shares?' · <span style="color:#F76902">shares '+x.shares+'</span>':'')+'</div>'; c2.appendChild(f2);
 
     var c3=el("td"); c3.innerHTML='<span class="b-gate">'+x.p.place+'</span>'+(x.p.q?'<div class="b-sub">prefers quiet company</div>':'');
 
@@ -817,7 +849,7 @@ function renderBoard(){
   [
     ["hot", hrs(wk.dead)+" h", "Layover this week", "Hours on campus your timetable chose for you, not hours you chose."],
     ["", wk.campusDays+" / 5", "Campus days", "Days you must physically be in Dubai Silicon Oasis."],
-    [r.fee? "hot":"", r.fee? "AED "+Math.round(r.fee*share).toLocaleString() : dur(wk.tail)+" ", r.fee? "Paid for dead hours" : "Waiting for the bus", r.fee? "Your share of the AED "+r.fee.toLocaleString()+" annual pass spent on stranded time." : "You set your own departure — this is gap time only."]
+    [r.fee? "hot":"", r.fee? "~AED "+(Math.round(r.fee*share/100)*100).toLocaleString() : dur(wk.tail), r.fee? "Of your pass, stranded" : "Waiting for the bus", r.fee? "Your AED "+r.fee.toLocaleString()+" pass, apportioned by the share of campus hours you did not choose." : "You set your own departure, so only gaps between classes count."]
   ].forEach(function(s){
     var d=el("div","stat "+s[0]);
     d.appendChild(el("div","k",s[2])); d.appendChild(el("div","n",s[1])); d.appendChild(el("div","s",s[3]));
@@ -978,8 +1010,7 @@ function renderReroute(){
   var st=document.getElementById("rrStats"); st.innerHTML="";
   [
     ["hot", hrs(wk.dead)+" h", "Dead hours / week", Math.round(share*100)+"% of every hour you spend on campus."],
-    ["", wk.campusDays+" days", "Campus days / week", "Each one costs a full round trip, whatever else is in it."],
-    ["", hrs(wk.dead*14)+" h", "Per semester", "Fourteen teaching weeks at your current timetable."]
+    ["", wk.campusDays+" days", "Campus days / week", "Each one costs a full round trip, whatever else is in it."]
   ].forEach(function(s){
     var d=el("div","stat "+s[0]); d.appendChild(el("div","k",s[2])); d.appendChild(el("div","n",s[1])); d.appendChild(el("div","s",s[3])); st.appendChild(d);
   });
@@ -996,7 +1027,7 @@ function renderReroute(){
 
   var cost=document.getElementById("rrCost");
   cost.innerHTML = r.fee
-    ? "Your "+r.label.split(" — ")[0]+" pass costs <span class=\"mono\" style=\"color:var(--amber)\">AED "+r.fee.toLocaleString()+"</span> a year. At this timetable, <strong>"+Math.round(share*100)+"%</strong> of the campus hours it buys you are hours you didn't choose — about <span class=\"mono\" style=\"color:var(--amber)\">AED "+Math.round(r.fee*share).toLocaleString()+"</span> of it. Reroute won't make the bus come more often. It shows you which section swap makes the bus matter less."
+    ? "Your "+r.label.split(" — ")[0]+" pass costs <span class=\"mono\" style=\"color:var(--amber-sm)\">AED "+r.fee.toLocaleString()+"</span> a year. At this timetable, <strong>"+Math.round(share*100)+"%</strong> of the campus hours it buys you are hours you did not choose, roughly <span class=\"mono\" style=\"color:var(--amber-sm)\">AED "+(Math.round(r.fee*share/100)*100).toLocaleString()+"</span>. Reroute cannot make the bus come more often; it shows which section swap makes the bus matter less."
     : "You're not on a bus pass, so your departure is yours to set. What's left is gap time between classes — <strong>"+hrs(wk.mid)+" hours a week</strong> — which is the one kind of dead time a section swap can remove completely.";
 
   var wi=document.getElementById("whatifs"); wi.innerHTML="";
