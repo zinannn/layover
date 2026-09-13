@@ -16,3 +16,13 @@ Layover reads the bus timetable as a social graph.
 No account, no server. Everything runs in the browser; no timetable leaves the device.
 
 `#designathon2026`
+
+---
+
+## Accounts, friends and shared groups
+
+The site runs with no backend at all — seeded data, in the visitor's browser.
+Add a free Supabase project and the same site becomes multi-user: real accounts,
+real timetables, real groups, real friends, updating live across devices.
+
+See [SETUP.md](SETUP.md). About five minutes, no cost, nothing secret committed.
