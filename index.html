@@ -711,6 +711,10 @@ footer strong{color:var(--muted)}
           <p class="eyebrow">Reroute</p>
           <p style="font-size:.89rem;color:var(--muted)">The part that prevents the problem instead of decorating it. Before registration, test a section swap and see what it does to the shape of the week — campus days, dead hours, and the share of your bus-pass fee spent on hours you didn't choose. <strong>"This swap removes 4.5 dead hours a week and one whole campus day."</strong></p>
         </div>
+        <div class="panel stack" style="gap:8px">
+          <p class="eyebrow">People you can actually find</p>
+          <p style="font-size:.89rem;color:var(--muted)">An account puts you on the board for other students and keeps your timetable across devices. The People page lists everyone on Layover with <strong>search by name or major, sort by name, major, year or bus route, and filters for route, year, shared courses, the same bus, and quiet company</strong> — so adding the right person never means scrolling the whole campus. Friend requests and the board filter for friends build on top of that.</p>
+        </div>
       </div>
 
       <div class="panel-quiet stack" style="gap:10px; margin-top:16px">
@@ -721,7 +725,7 @@ footer strong{color:var(--muted)}
           <li>The board is a real HTML table with proper headers, works entirely by keyboard, and every status is carried by text as well as colour — nothing depends on distinguishing amber from green.</li>
           <li>Colour follows RIT&rsquo;s published brand rule rather than approximating it: RIT Orange <span class="mono" style="font-size:.8rem">#F76902</span> is used only for fills and type at 18.76px bold or larger, and RIT&rsquo;s accessible orange <span class="mono" style="font-size:.8rem">#C75300</span> carries everything smaller.</li>
           <li>Both a light and a dark theme are designed, and all motion is disabled automatically under <span class="mono" style="font-size:.8rem">prefers-reduced-motion</span>.</li>
-          <li>No account, no upload, no server: everything runs and persists in the browser, which also means nobody's timetable leaves their own device.</li>
+          <li>No account is needed to explore: the board, gates and Reroute run on local example data. <strong>Sign in only when you want to be seen</strong> — your timetable syncs across devices, you appear on the board for others while you opt to stay visible, and nothing else leaves your device.</li>
         </ul>
       </div>
     </div>
@@ -896,6 +900,7 @@ var S = {
 };
 try{ var raw=localStorage.getItem("layover.v1"); if(raw){ var o=JSON.parse(raw); for(var k in o) S[k]=o[k]; } }catch(e){}
 function save(){ try{ localStorage.setItem("layover.v1", JSON.stringify(S)); }catch(e){} }
+if(!S.ppl || typeof S.ppl!=="object") S.ppl={q:"",sort:"name",route:"all",year:"all",shares:false,sameRoute:false,quiet:false};
 
 var DEMO = ["Mon 09:00-10:50 CSCI-141","Mon 14:00-15:10 MGMT-101","Tue 11:00-12:50 PHYS-211","Wed 09:00-10:50 CSCI-141","Wed 13:00-14:50 MATH-181","Thu 11:00-12:50 PHYS-211","Thu 16:00-17:50 ISTE-230"];
 if(!S.classes.length){ S.classes = parseSched(DEMO); S.name = S.name || "You"; }
@@ -1272,19 +1277,115 @@ function dirName(id){
   for(var i=0;i<Cloud.directory.length;i++) if(Cloud.directory[i].id===id) return Cloud.directory[i].display_name;
   return "A student";
 }
+function routeShort(id){
+  var r=ROUTE[id];
+  if(!r) return id||"";
+  return r.label.split(" — ")[0];
+}
+function myCodeSet(){
+  var m={}; (S.classes||[]).forEach(function(c){ m[c.code]=1; });
+  return m;
+}
+function sharedCodeWith(pr){
+  if(!pr || !pr.id) return null;
+  var mine=myCodeSet(), hit=null;
+  var list=(window.Cloud && Cloud.byProfile && Cloud.byProfile[pr.id]) || [];
+  for(var i=0;i<list.length;i++){ if(mine[list[i].code]){ hit=list[i].code; break; } }
+  return hit;
+}
 function personRow(pr, actions){
   var row=el("div","person");
   var L=el("div");
   L.appendChild(el("div","pn",pr.display_name));
-  L.appendChild(el("div","pm",(pr.major||"Student")+(pr.year?" · "+pr.year:"")+(pr.is_demo?" · example":"")));
+  var sub=(pr.major||"Student")+(pr.year?" · "+pr.year:"");
+  var rs=pr.route?routeShort(pr.route):"";
+  if(rs) sub+=" · "+rs;
+  if(pr.is_demo) sub+=" · example";
+  L.appendChild(el("div","pm",sub));
+  var sh=sharedCodeWith(pr);
+  if(sh){
+    var sm=el("div","pm"); sm.innerHTML='shares <span style="color:var(--amber-sm)">'+sh+'</span>';
+    L.appendChild(sm);
+  } else if(pr.quiet){
+    L.appendChild(el("div","pm","prefers quiet company"));
+  }
   row.appendChild(L);
   var R=el("div","row"); R.style.gap="6px";
   actions.forEach(function(a){ R.appendChild(a); });
   row.appendChild(R);
   return row;
 }
+/* Filter + sort state lives in S.ppl so it survives reloads. renderDirList only
+   touches the list, so typing in the search box never loses focus. */
+function dirFiltered(){
+  var f=S.ppl, q=(f.q||"").toLowerCase().trim();
+  var out=Cloud.directory.filter(function(pr){ return Cloud.friends[pr.id]!=="accepted"; });
+  if(q) out=out.filter(function(pr){
+    return (pr.display_name||"").toLowerCase().indexOf(q)>=0 || (pr.major||"").toLowerCase().indexOf(q)>=0;
+  });
+  if(f.route && f.route!=="all") out=out.filter(function(pr){ return pr.route===f.route; });
+  if(f.year && f.year!=="all") out=out.filter(function(pr){ return pr.year===f.year; });
+  if(f.sameRoute) out=out.filter(function(pr){ return pr.route===S.route; });
+  if(f.quiet) out=out.filter(function(pr){ return !!pr.quiet; });
+  if(f.shares) out=out.filter(function(pr){ return !!sharedCodeWith(pr); });
+  var s=f.sort||"name";
+  out.sort(function(a,b){
+    if(s==="major") return (a.major||"").localeCompare(b.major||"") || a.display_name.localeCompare(b.display_name);
+    if(s==="year") return (a.year||"").localeCompare(b.year||"") || a.display_name.localeCompare(b.display_name);
+    if(s==="route") return routeShort(a.route).localeCompare(routeShort(b.route)) || a.display_name.localeCompare(b.display_name);
+    return a.display_name.localeCompare(b.display_name);
+  });
+  return out;
+}
+function dirActions(pr){
+  var st=Cloud.friends[pr.id], acts=[];
+  if(st==="pending-out"){ acts.push(el("span","tag","Requested")); }
+  else if(st==="pending-in"){
+    var a2=el("button","btn sm","Accept");
+    a2.addEventListener("click",function(){
+      var row=Cloud.incoming.filter(function(x){return x.from===pr.id;})[0];
+      if(row) Cloud.acceptFriend(row.id);
+    });
+    acts.push(a2);
+  } else {
+    var add=el("button","btn ghost sm","Add");
+    add.addEventListener("click",function(){
+      if(!SIGNED_IN()){ openAuth("Sign in to add people."); return; }
+      Cloud.addFriend(pr.id).then(function(r){ if(r&&r.error) alert(r.error); });
+    });
+    acts.push(add);
+  }
+  return acts;
+}
+function renderDirList(){
+  var list=document.getElementById("dirList"), cnt=document.getElementById("dirCount");
+  if(!list) return;
+  list.innerHTML="";
+  var total=Cloud.directory.filter(function(pr){ return Cloud.friends[pr.id]!=="accepted"; }).length;
+  var rows=dirFiltered();
+  if(cnt) cnt.textContent = rows.length===total
+    ? total+" student"+(total===1?"":"s")
+    : rows.length+" of "+total+" students";
+  if(!rows.length){
+    var e=el("div","offnote");
+    if(!total){
+      e.textContent="Nobody else yet. New accounts show up here the moment they sign in.";
+      list.appendChild(e); return;
+    }
+    e.innerHTML="<strong style='color:var(--text)'>Nobody matches that.</strong><br>Clear the search or loosen a filter.";
+    var c=el("button","btn ghost sm","Clear search and filters");
+    c.style.marginTop="10px";
+    c.addEventListener("click",function(){
+      S.ppl={q:"",sort:"name",route:"all",year:"all",shares:false,sameRoute:false,quiet:false};
+      save(); renderPeople();
+    });
+    e.appendChild(c); list.appendChild(e); return;
+  }
+  rows.forEach(function(pr){ list.appendChild(personRow(pr,dirActions(pr))); });
+}
 function renderPeople(){
   var w=document.getElementById("peopleWrap"); if(!w) return;
+  var refocusSearch = !!(document.activeElement && document.activeElement.id==="dirSearch");
   w.innerHTML="";
 
   if(!window.Cloud || !Cloud.enabled){
@@ -1347,35 +1448,56 @@ function renderPeople(){
     rf.appendChild(fb); w.appendChild(rf);
   }
 
-  var others=Cloud.directory.filter(function(pr){ return Cloud.friends[pr.id]!=="accepted"; });
   var ro=el("div","stack"); ro.style.gap="10px";
   ro.appendChild(el("h2","secttl","Everyone on Layover"));
-  if(!others.length) ro.appendChild(el("p","lede","Nobody else yet."));
-  else{
-    var ob=el("div","listbox");
-    others.forEach(function(pr){
-      var st=Cloud.friends[pr.id], acts=[];
-      if(st==="pending-out"){ var q=el("span","tag","Requested"); acts.push(q); }
-      else if(st==="pending-in"){
-        var a2=el("button","btn sm","Accept");
-        a2.addEventListener("click",function(){
-          var row=Cloud.incoming.filter(function(x){return x.from===pr.id;})[0];
-          if(row) Cloud.acceptFriend(row.id);
-        });
-        acts.push(a2);
-      } else {
-        var add=el("button","btn ghost sm","Add");
-        add.addEventListener("click",function(){
-          if(!SIGNED_IN()){ openAuth("Sign in to add people."); return; }
-          Cloud.addFriend(pr.id).then(function(r){ if(r&&r.error) alert(r.error); });
-        });
-        acts.push(add);
-      }
-      ob.appendChild(personRow(pr,acts));
+  var ctl=el("div","stack"); ctl.style.gap="10px";
+  var r1=el("div","row"); r1.style.gap="8px";
+  var lq=el("label","f"); lq.style.cssText="flex:2 1 180px"; lq.appendChild(el("span",null,"Search"));
+  var qi=document.createElement("input"); qi.type="text"; qi.id="dirSearch";
+  qi.placeholder="Name or major…"; qi.value=S.ppl.q||"";
+  qi.setAttribute("aria-label","Search students by name or major");
+  lq.appendChild(qi); r1.appendChild(lq);
+  var ls=el("label","f"); ls.style.cssText="flex:0 0 132px"; ls.appendChild(el("span",null,"Sort"));
+  var so=document.createElement("select"); so.id="dirSort";
+  [["name","Name A–Z"],["major","Major A–Z"],["year","Year"],["route","Bus route"]].forEach(function(o){
+    var op=el("option",null,o[1]); op.value=o[0]; so.appendChild(op);
+  });
+  so.value=S.ppl.sort||"name"; ls.appendChild(so); r1.appendChild(ls);
+  var lr=el("label","f"); lr.style.cssText="flex:1 1 160px"; lr.appendChild(el("span",null,"Bus route"));
+  var rs=document.createElement("select"); rs.id="dirRoute";
+  var ra=el("option",null,"All routes"); ra.value="all"; rs.appendChild(ra);
+  ROUTES.forEach(function(r){ var op=el("option",null,r.label); op.value=r.id; rs.appendChild(op); });
+  rs.value=S.ppl.route||"all"; lr.appendChild(rs); r1.appendChild(lr);
+  var ly=el("label","f"); ly.style.cssText="flex:0 0 108px"; ly.appendChild(el("span",null,"Year"));
+  var ys=document.createElement("select"); ys.id="dirYear";
+  [["all","All years"],["Y1","Y1"],["Y2","Y2"],["Y3","Y3"],["Y4","Y4"]].forEach(function(o){
+    var op=el("option",null,o[1]); op.value=o[0]; ys.appendChild(op);
+  });
+  ys.value=S.ppl.year||"all"; ly.appendChild(ys); r1.appendChild(ly);
+  ctl.appendChild(r1);
+  var chips=el("div","chipset");
+  [["shares","Shares a course with me"],["sameRoute","Same bus route"],["quiet","Quiet-friendly"]].forEach(function(c){
+    var b=el("button","chip",c[1]); b.dataset.p=c[0];
+    b.setAttribute("aria-pressed",S.ppl[c[0]]?"true":"false");
+    b.addEventListener("click",function(){
+      S.ppl[c[0]]=!S.ppl[c[0]];
+      b.setAttribute("aria-pressed",S.ppl[c[0]]?"true":"false");
+      save(); renderDirList();
     });
-    ro.appendChild(ob);
-  }
+    chips.appendChild(b);
+  });
+  ctl.appendChild(chips);
+  ctl.appendChild(el("div","mini",""));
+  ctl.lastChild.id="dirCount";
+  ro.appendChild(ctl);
+  var ob=el("div","listbox"); ob.id="dirList"; ro.appendChild(ob);
   w.appendChild(ro);
+  qi.addEventListener("input",function(){ S.ppl.q=qi.value; save(); renderDirList(); });
+  so.addEventListener("change",function(){ S.ppl.sort=so.value; save(); renderDirList(); });
+  rs.addEventListener("change",function(){ S.ppl.route=rs.value; save(); renderDirList(); });
+  ys.addEventListener("change",function(){ S.ppl.year=ys.value; save(); renderDirList(); });
+  renderDirList();
+  if(refocusSearch){ var q2=document.getElementById("dirSearch"); if(q2){ q2.focus(); try{ q2.setSelectionRange(q2.value.length,q2.value.length); }catch(e){} } }
 }
 
 /* ================= AUTH ================= */

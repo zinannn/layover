@@ -108,6 +108,7 @@
 
       // my own classes, in the local shape
       Cloud.myClasses = myId ? (byProfile[myId] || []) : [];
+      Cloud.byProfile = byProfile;
 
       await loadFriends(myId);
 
