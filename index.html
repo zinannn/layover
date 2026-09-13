@@ -104,9 +104,13 @@ strong{color:var(--text); font-weight:600}
 /* ============ RIT INSTITUTIONAL BAR ============ */
 .ritbar{background:var(--surface-2); border-bottom:1px solid var(--line)}
 .ritbar-in{max-width:var(--maxw); margin:0 auto; padding:8px 20px; display:flex; align-items:center; gap:12px; flex-wrap:wrap}
-.ritmark{
-  font-family:var(--font-sans); font-weight:700; font-size:1.25rem; line-height:1;
-  letter-spacing:.01em; color:var(--amber);   /* 20px bold: RIT Orange is permitted at this size */
+.lockup{height:26px; width:auto; display:block}
+.lockup-light{display:none}
+:root[data-theme="light"] .lockup-dark{display:none}
+:root[data-theme="light"] .lockup-light{display:block}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]) .lockup-dark{display:none}
+  :root:not([data-theme="dark"]) .lockup-light{display:block}
 }
 .ritname{font-size:.76rem; color:var(--muted); letter-spacing:.01em}
 .ritnote{
@@ -192,6 +196,15 @@ select{cursor:pointer}
 .tag.amb{background:var(--amber-soft); color:var(--amber); border-color:transparent}
 .tag.red{background:var(--alert-soft); color:var(--alert); border-color:transparent}
 
+/* ============ DEPARTURE PANEL ============ */
+.dep{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.dep>div{background:var(--surface); padding:17px 19px; display:flex; flex-direction:column; gap:3px; min-width:0}
+.dep-k{font-family:var(--font-board); font-size:.55rem; letter-spacing:.17em; text-transform:uppercase; color:var(--dim)}
+.dep-t{font-family:var(--font-board); font-size:2rem; font-weight:600; letter-spacing:-.035em; line-height:1.08; font-variant-numeric:tabular-nums; color:var(--amber)}
+.dep-t.plain{color:var(--text); font-size:1.4rem}
+.dep-sub{font-size:.81rem; color:var(--muted); line-height:1.4}
+.secttl{font-size:1.06rem; letter-spacing:-.012em; font-weight:600}
+
 /* ============ THE BOARD ============ */
 .board{
   max-width:100%;
@@ -240,7 +253,8 @@ table.brd tbody tr[aria-selected="true"]{background:rgba(255,176,0,.09)}
 .axis{display:flex; justify-content:space-between; font-family:var(--font-board); font-size:.55rem; color:var(--dim); letter-spacing:.08em; padding-left:56px}
 
 /* ============ GATES ============ */
-.gate{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:11px}
+.gate{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:11px; align-items:stretch}
+.gate>.btn{align-self:flex-start}
 .gate.fits{border-left:3px solid var(--go); padding-left:16px}
 .gate.clash{opacity:.62}
 .gate .gh{display:flex; align-items:baseline; justify-content:space-between; gap:10px}
@@ -304,8 +318,9 @@ footer strong{color:var(--muted)}
 
 <div class="ritbar">
   <div class="ritbar-in">
-    <span class="ritmark">RIT</span>
-    <span class="ritname">Rochester Institute of Technology &middot; Dubai &middot; Dubai Silicon Oasis</span>
+    <img class="lockup lockup-dark" src="assets/rit-dubai-white.svg" alt="RIT Dubai" width="189" height="37">
+    <img class="lockup lockup-light" src="assets/rit-dubai-orange.svg" alt="RIT Dubai" width="189" height="37">
+    <span class="ritname">Dubai Silicon Oasis campus</span>
     <span class="ritnote">Student project &middot; DesignAthon 2026</span>
   </div>
 </div>
@@ -328,19 +343,14 @@ footer strong{color:var(--muted)}
 <main id="main">
 
 <!-- ===================== BOARD ===================== -->
-<section class="view" id="v-/" aria-label="Departure board">
-  <div class="hero stack">
-    <p class="eyebrow">RIT Dubai · Parking Lot 3 · Departures 15:00 &amp; 18:00</p>
-    <h1>Your last class ended at 15:10.<br>The next bus leaves at <span>18:00</span>.</h1>
-    <p class="lede">That's not a break. It's a <strong>layover</strong> — too long to waste, too short to go home, and spent alone because nobody knows who else is stranded in the same window. Layover reads the bus timetable as a social graph and shows who is grounded with you, right now.</p>
-  </div>
+<section class="view" id="v-/" aria-label="Board">
+  <div class="stack" style="padding-top:6px">
 
-  <div class="stack" style="margin-top:30px">
-    <div class="grid3" id="heroStats"></div>
+    <div class="dep" id="depPanel"></div>
 
-    <div class="row" style="justify-content:space-between; margin-top:14px">
+    <div class="row" style="justify-content:space-between; margin-top:12px">
       <div class="chipset" role="group" aria-label="Filter the board">
-        <button class="chip" data-f="mine" aria-pressed="true">Overlaps my layover</button>
+        <button class="chip" data-f="mine" aria-pressed="true">Overlaps my window</button>
         <button class="chip" data-f="route" aria-pressed="false">My bus route</button>
         <button class="chip" data-f="course" aria-pressed="false">Shares a course</button>
         <button class="chip" data-f="quiet" aria-pressed="false">Quiet company</button>
@@ -357,9 +367,9 @@ footer strong{color:var(--muted)}
 
     <div class="board board-scope">
       <div class="board-head">
-        <span class="t amb">◉ GROUNDED</span>
-        <span class="t" id="boardCtx">—</span>
-        <span class="t" style="margin-left:auto" id="boardCount">—</span>
+        <span class="t amb">&#9673; GROUNDED</span>
+        <span class="t" id="boardCtx">&mdash;</span>
+        <span class="t" style="margin-left:auto" id="boardCount">&mdash;</span>
       </div>
       <div class="bwrap">
         <table class="brd">
@@ -377,36 +387,19 @@ footer strong{color:var(--muted)}
       </div>
       <div id="boardEmpty" class="empty" hidden></div>
     </div>
-    <p class="mini" id="boardNote">Rows are seeded example students so the board is never empty. Your own layover is computed from the schedule in <a href="#/day" style="color:var(--amber-sm)">My Day</a>.</p>
-  </div>
+    <p class="mini" id="boardNote">Students shown are seeded examples, so the board is never empty.</p>
 
-  <div class="stack-lg" style="margin-top:64px">
-    <div class="stack">
-      <p class="eyebrow">Why time, not interest</p>
-      <h2>Every campus app matches on what you like.<br>A commuter campus is constrained by when you're here.</h2>
-      <p class="lede">Two students who would get on brilliantly never meet, because their free hours don't intersect and they leave on different buses. Interest-matching hands you a name you can never actually sit down with. Layover starts from the only thing that decides whether a meeting can physically happen: the intersection of two timetables, ending at two different departure times.</p>
-      <div class="grid2" style="margin-top:12px">
-        <div class="panel-quiet stack" style="gap:8px">
-          <p class="eyebrow q">The usual model</p>
-          <p style="font-size:.9rem;color:var(--muted)">Profile → interests → suggested people → a chat that dies in four messages, because meeting requires solving a scheduling problem neither of you can see.</p>
-        </div>
-        <div class="panel stack" style="gap:8px">
-          <p class="eyebrow">Layover's model</p>
-          <p style="font-size:.9rem;color:var(--muted)">Timetable → computed dead window → people whose window overlaps yours <em>by enough minutes to be worth walking to</em> → a gate that already fits both of you.</p>
-        </div>
-      </div>
+    <div class="stack" style="margin-top:30px; gap:12px">
+      <h2 class="secttl" id="fitTitle">Gates in this window</h2>
+      <div class="grid3" id="fitGates"></div>
     </div>
+
   </div>
 </section>
 
 <!-- ===================== GATES ===================== -->
 <section class="view" id="v-/gates" aria-label="Gates">
-  <div class="stack" style="max-width:74ch">
-    <p class="eyebrow">Gates</p>
-    <h2>Things that fit exactly inside the window you have.</h2>
-    <p class="lede">A gate is a plan sized to a layover — not an event you have to leave early or arrive late for. Every gate is checked against your own dead window and your bus. If it would make you miss the 18:00, Layover says so before you commit.</p>
-  </div>
-  <div class="row" style="margin:26px 0 16px; justify-content:space-between">
+  <div class="row" style="margin:6px 0 16px; justify-content:space-between">
     <div class="chipset" role="group" aria-label="Filter gates">
       <button class="chip" data-g="all" aria-pressed="true">All</button>
       <button class="chip" data-g="fits" aria-pressed="false">Fits my layover</button>
@@ -422,13 +415,7 @@ footer strong{color:var(--muted)}
 
 <!-- ===================== MY DAY ===================== -->
 <section class="view" id="v-/day" aria-label="My day">
-  <div class="stack" style="max-width:74ch">
-    <p class="eyebrow">My Day</p>
-    <h2>Your day doesn't end when your last class ends.</h2>
-    <p class="lede">It ends when the bus leaves. Pick your route and drop in your classes — Layover computes the hours the timetable hands you whether you wanted them or not: the morning wait before your first class, the gaps in the middle, and the tail between your last class and departure.</p>
-  </div>
-
-  <div class="grid2" style="margin-top:28px; align-items:start">
+  <div class="grid2" style="margin-top:6px; align-items:start">
     <div class="panel stack">
       <p class="eyebrow">Your commute</p>
       <label class="f">Name shown on the board
@@ -481,26 +468,17 @@ footer strong{color:var(--muted)}
 
 <!-- ===================== REROUTE ===================== -->
 <section class="view" id="v-/reroute" aria-label="Reroute">
-  <div class="stack" style="max-width:74ch">
-    <p class="eyebrow">Reroute</p>
-    <h2>Register for a timetable, not a list of course sections.</h2>
-    <p class="lede">Students pick sections on whether the times clash. Nobody is shown what a section does to the <em>shape</em> of the week — how many days you must physically be on campus, and how many hours the bus schedule will add on top. Reroute scores that, and prices it against what your bus pass actually costs.</p>
-  </div>
-
-  <div class="grid3" style="margin-top:26px" id="rrStats"></div>
+  <div class="grid3" style="margin-top:6px" id="rrStats"></div>
 
   <div class="grid2" style="margin-top:18px; align-items:start">
     <div class="panel stack">
       <p class="eyebrow">What-if</p>
-      <p style="font-size:.87rem;color:var(--muted)">Move one course to a different section and watch the shape of the week change. These are applied to your live schedule — undo by reloading the example week.</p>
+      <p style="font-size:.82rem;color:var(--muted)">Applies to your live schedule. Reload the example week in My Day to undo.</p>
       <div class="stack" style="gap:8px" id="whatifs"></div>
     </div>
     <div class="panel stack">
       <p class="eyebrow">Where the dead hours come from</p>
       <div class="stack" style="gap:0" id="rrBreak"></div>
-      <hr class="hr">
-      <p class="eyebrow">The cost line</p>
-      <p id="rrCost" style="font-size:.92rem; color:var(--muted); line-height:1.55"></p>
     </div>
   </div>
 </section>
@@ -612,7 +590,10 @@ footer strong{color:var(--muted)}
 <footer>
   <div class="fi">
     <div class="fcol">
-      <p class="fbrand"><span class="ritmark">RIT</span> Rochester Institute of Technology &middot; Dubai</p>
+      <p class="fbrand">
+        <img class="lockup lockup-dark" src="assets/rit-dubai-white.svg" alt="RIT Dubai" width="189" height="37">
+        <img class="lockup lockup-light" src="assets/rit-dubai-orange.svg" alt="RIT Dubai" width="189" height="37">
+      </p>
       <p>Layover is a <strong>student project</strong> submitted to DesignAthon 2026, hosted by GDC RIT Dubai in partnership with +TWE. It is not an official RIT service and is not operated by RIT Dubai&rsquo;s transport office.</p>
       <p>Route names, departure times and fares are taken from RIT Dubai&rsquo;s published Parking &amp; Transportation page. Interface colours follow RIT&rsquo;s brand palette: RIT Orange #F76902 for fills and large bold type, accessible orange #C75300 for smaller text.</p>
       <p>#designathon2026</p>
@@ -665,16 +646,16 @@ var SEED = [
 ];
 
 var GATES = [
-  {id:"g1", code:"GATE 1",  t:"study", title:"MATH-181 problem set, together",   place:"Library L1 — group tables", day:"Mon", a:"15:10", b:"16:40", host:"Omar B.", cap:6,  join:4, tags:["Study","MATH-181"], d:"The Monday 15:10 crowd all miss the 3 o'clock bus anyway. Bring the problem set you're stuck on; nobody explains, everyone works."},
-  {id:"g2", code:"GATE 2",  t:"coop",  title:"Co-op mock interview — 20 min each",place:"Co-op office corridor", day:"Tue", a:"15:20", b:"17:00", host:"Mariam H.", cap:8, join:6, tags:["Co-op","Careers"], d:"Two chairs, one timer, real questions from last year's placements. Co-op is compulsory here and these are the exact hours nobody is using to prepare for it."},
-  {id:"g3", code:"GATE 3",  t:"quiet", title:"Quiet Gate — company, no conversation", place:"Library L2 — Quiet Wing", day:"Mon", a:"15:00", b:"18:00", host:"Sara M.", cap:12, join:9, tags:["Quiet","No talking"], d:"A table where the rule is explicit: you sit together and you do not talk. For everyone who finds three unstructured hours draining rather than restorative."},
-  {id:"g4", code:"GATE 4",  t:"move",  title:"Sports hall — pickup, 5-a-side",   place:"Sports hall", day:"Wed", a:"15:15", b:"17:30", host:"Rayan K.", cap:14, join:11, tags:["Move","Indoor"], d:"Indoor, air-conditioned, and it ends at 17:30 so the 18:00 bus is never in doubt. Kit lockers at the entrance."},
-  {id:"g5", code:"GATE 5",  t:"study", title:"SWEN-261 lab catch-up",           place:"Study pods B2", day:"Thu", a:"13:00", b:"14:45", host:"Nikhil S.", cap:5, join:5, tags:["Study","SWEN-261"], d:"Midday gap, not a bus wait. Whiteboard is booked. Full — join the next one."},
-  {id:"g6", code:"GATE 6",  t:"move",  title:"Iced karak + laps of the courtyard", place:"Shaded courtyard", day:"Tue", a:"15:10", b:"15:55", host:"Yusuf A.", cap:10, join:3, tags:["Move","Short"], d:"Forty-five minutes, no commitment, out before the heat of the afternoon eases. Good if your overlap with everyone else is small."},
-  {id:"g7", code:"GATE 7",  t:"study", title:"PHYS-211 exam review, whiteboard", place:"Library L1 — group tables", day:"Wed", a:"16:00", b:"17:45", host:"Fatima Z.", cap:8, join:5, tags:["Study","PHYS-211"], d:"Second-years running last year's paper. Bring your own past paper; we work from the marking scheme."},
-  {id:"g8", code:"GATE 8",  t:"coop",  title:"CV surgery — 15 minutes, one page", place:"Innovation Center atrium", day:"Thu", a:"15:10", b:"17:00", host:"Hana T.", cap:6, join:2, tags:["Co-op","CV"], d:"Third-years who've been through co-op read first- and second-year CVs. Fifteen minutes, one page, honest feedback."},
-  {id:"g9", code:"GATE 9",  t:"quiet", title:"Reading hour — phones in the box", place:"Library L2 — Quiet Wing", day:"Thu", a:"16:15", b:"17:45", host:"Leen F.", cap:10, join:6, tags:["Quiet","Reading"], d:"Anything you like, on paper or screen, as long as it isn't coursework. Phones go in the box at the start."},
-  {id:"g10",code:"GATE 10", t:"study", title:"First-year drop-in — ask anything", place:"Building 1 food court", day:"Mon", a:"12:00", b:"13:30", host:"Daniyal I.", cap:12, join:7, tags:["Study","Year 1"], d:"The unwritten rules: how add/drop actually works, what office hours are for, which co-op deadlines sneak up on you. No question is too basic."}
+  {id:"g1", code:"GATE 1",  t:"study", title:"MATH-181 problem set, together",   place:"Library L1 — group tables", day:"Mon", a:"15:10", b:"16:40", host:"Omar B.", cap:6,  join:4, tags:["Study","MATH-181"], d:"Bring the question you are stuck on. Nobody teaches, everyone works."},
+  {id:"g2", code:"GATE 2",  t:"coop",  title:"Co-op mock interview — 20 min each",place:"Co-op office corridor", day:"Tue", a:"15:20", b:"17:00", host:"Mariam H.", cap:8, join:6, tags:["Co-op","Careers"], d:"Two chairs, one timer, questions from last year's placements."},
+  {id:"g3", code:"GATE 3",  t:"quiet", title:"Quiet Gate — company, no conversation", place:"Library L2 — Quiet Wing", day:"Mon", a:"15:00", b:"18:00", host:"Sara M.", cap:12, join:9, tags:["Quiet","No talking"], d:"Sit together, do not talk. That is the whole rule."},
+  {id:"g4", code:"GATE 4",  t:"move",  title:"Sports hall — pickup, 5-a-side",   place:"Sports hall", day:"Wed", a:"15:15", b:"17:30", host:"Rayan K.", cap:14, join:11, tags:["Move","Indoor"], d:"Indoor and air-conditioned. Ends 17:30, so the 18:00 is safe. Kit lockers at the entrance."},
+  {id:"g5", code:"GATE 5",  t:"study", title:"SWEN-261 lab catch-up",           place:"Study pods B2", day:"Thu", a:"13:00", b:"14:45", host:"Nikhil S.", cap:5, join:5, tags:["Study","SWEN-261"], d:"Whiteboard booked. Full — join the next one."},
+  {id:"g6", code:"GATE 6",  t:"move",  title:"Iced karak + laps of the courtyard", place:"Shaded courtyard", day:"Tue", a:"15:10", b:"15:55", host:"Yusuf A.", cap:10, join:3, tags:["Move","Short"], d:"Forty-five minutes, no commitment."},
+  {id:"g7", code:"GATE 7",  t:"study", title:"PHYS-211 exam review, whiteboard", place:"Library L1 — group tables", day:"Wed", a:"16:00", b:"17:45", host:"Fatima Z.", cap:8, join:5, tags:["Study","PHYS-211"], d:"Last year's paper, worked from the marking scheme. Bring your own copy."},
+  {id:"g8", code:"GATE 8",  t:"coop",  title:"CV surgery — 15 minutes, one page", place:"Innovation Center atrium", day:"Thu", a:"15:10", b:"17:00", host:"Hana T.", cap:6, join:2, tags:["Co-op","CV"], d:"Third-years who have done co-op read your CV. Fifteen minutes, one page."},
+  {id:"g9", code:"GATE 9",  t:"quiet", title:"Reading hour — phones in the box", place:"Library L2 — Quiet Wing", day:"Thu", a:"16:15", b:"17:45", host:"Leen F.", cap:10, join:6, tags:["Quiet","Reading"], d:"Anything that is not coursework. Phones go in the box."},
+  {id:"g10",code:"GATE 10", t:"study", title:"First-year drop-in — ask anything", place:"Building 1 food court", day:"Mon", a:"12:00", b:"13:30", host:"Daniyal I.", cap:12, join:7, tags:["Study","Year 1"], d:"Add/drop, office hours, co-op deadlines. No question is too basic."}
 ];
 
 /* ================= HELPERS ================= */
@@ -777,6 +758,7 @@ function tickClock(){
 }
 
 /* ================= BOARD ================= */
+var GROUNDED_NOW = 0;
 function overlapMin(aA,aB,bA,bB){ return Math.max(0, Math.min(aB,bB)-Math.max(aA,bA)); }
 
 function activeWindow(model, t){
@@ -842,18 +824,88 @@ function renderBoard(){
   document.getElementById("boardCount").textContent = rows.length+" GROUNDED";
   document.getElementById("boardCtx").textContent = day.toUpperCase()+" "+m2s(t)+"  ·  YOU: "+(myW ? (dur(myW.b-t)+" LEFT, BUS "+(ROUTE[S.route].dep?m2s(myM.depart):"N/A")) : myStatus(myM,t));
 
-  /* hero stats */
-  var wk=weekModel(S.classes,S.route), r=ROUTE[S.route];
-  var share = wk.total? wk.dead/wk.total : 0;
-  var hs=document.getElementById("heroStats"); hs.innerHTML="";
-  [
-    ["hot", hrs(wk.dead)+" h", "Layover this week", "Hours on campus your timetable chose for you, not hours you chose."],
-    ["", wk.campusDays+" / 5", "Campus days", "Days you must physically be in Dubai Silicon Oasis."],
-    [r.fee? "hot":"", r.fee? "~AED "+(Math.round(r.fee*share/100)*100).toLocaleString() : dur(wk.tail), r.fee? "Of your pass, stranded" : "Waiting for the bus", r.fee? "Your AED "+r.fee.toLocaleString()+" pass, apportioned by the share of campus hours you did not choose." : "You set your own departure, so only gaps between classes count."]
-  ].forEach(function(s){
-    var d=el("div","stat "+s[0]);
-    d.appendChild(el("div","k",s[2])); d.appendChild(el("div","n",s[1])); d.appendChild(el("div","s",s[3]));
-    hs.appendChild(d);
+  GROUNDED_NOW = rows.length;
+  renderDep();
+  renderFitGates();
+}
+
+/* The one thing a student opens this for: when the bus goes and how long they have. */
+function renderDep(){
+  var day=S.vDay, t=S.vTime, r=ROUTE[S.route];
+  var m=dayModel(S.classes,S.route,day), w=activeWindow(m,t);
+  var box=document.getElementById("depPanel"); box.innerHTML="";
+  function cell(k,big,sub,plain){
+    var d=el("div");
+    d.appendChild(el("div","dep-k",k));
+    d.appendChild(el("div","dep-t"+(plain?" plain":""),big));
+    d.appendChild(el("div","dep-sub",sub));
+    box.appendChild(d);
+  }
+
+  if(!m.on){
+    cell("Next departure","No bus","You have no classes on "+day+".",true);
+    cell("Your window","—","Pick a day you are on campus.",true);
+    cell("Grounded with you",String(GROUNDED_NOW),"students free at "+m2s(t)+".");
+    return;
+  }
+
+  if(r.dep && m.depart!=null){
+    cell("Next departure", m2s(m.depart), "Parking Lot 3 · "+r.label);
+    var left=m.depart-t;
+    if(left>0) cell("Boarding in", dur(left), w ? "You are free until then." : "You are in class for part of it.");
+    else cell("Boarding in","Departed","The "+m2s(m.depart)+" has already gone.",true);
+  } else {
+    cell("Next departure","Your call", r.label+" — you are not tied to a bus.",true);
+    cell("Last class ends", m2s(m.last), "Nothing is holding you on campus after that.");
+  }
+
+  if(w){
+    var same = (r.dep && m.depart!=null && w.b===m.depart);
+    if(same) cell("Grounded with you", String(GROUNDED_NOW), GROUNDED_NOW===1?"student free in the same window.":"students free in the same window.");
+    else cell("Free until", m2s(w.b), dur(w.b-t)+" left · "+(w.kind==="head"?"on campus early":"gap between classes"));
+  } else {
+    cell("Right now","In class",(function(){ for(var i=0;i<m.classes.length;i++){ if(t>=m.classes[i].start && t<m.classes[i].end) return m.classes[i].code+" until "+m2s(m.classes[i].end)+"."; } return "Not on campus at "+m2s(t)+"."; })(), true);
+  }
+}
+
+/* Gates that still fit what is left of the window — somewhere to actually go. */
+function renderFitGates(){
+  var day=S.vDay, t=S.vTime, m=dayModel(S.classes,S.route,day);
+  var list=document.getElementById("fitGates"); list.innerHTML="";
+  var hits=[];
+  GATES.forEach(function(g){
+    if(g.day!==day) return;
+    var a=s2m(g.a), b=s2m(g.b);
+    if(b<=t+10) return;
+    var fit=0; m.windows.forEach(function(w){ fit=Math.max(fit, overlapMin(w.a,w.b,Math.max(a,t),b)); });
+    if(fit<20) return;
+    if(ROUTE[S.route].dep && m.depart!=null && b>m.depart) return;
+    hits.push({g:g,a:a,b:b,fit:fit});
+  });
+  hits.sort(function(x,y){return x.a-y.a;});
+  hits=hits.slice(0,3);
+
+  document.getElementById("fitTitle").textContent = hits.length ? "Gates that fit this window" : "Nothing fits this window";
+  if(!hits.length){
+    var e=el("p","lede");
+    e.innerHTML='Nothing left on '+day+' fits before your bus. <a href="#/gates" style="color:var(--amber-sm)">See every gate</a> or open one of your own.';
+    list.appendChild(e); return;
+  }
+  hits.forEach(function(x){
+    var g=x.g, joined=!!S.joined[g.id], cnt=g.join+(joined?1:0);
+    var c=el("div","gate fits");
+    var gh=el("div","gh");
+    var L=el("div"); L.appendChild(el("div","code",g.code)); L.appendChild(el("h3",null,g.title));
+    gh.appendChild(L); gh.appendChild(el("div","when",g.a+"–"+g.b)); c.appendChild(gh);
+    var meta=el("div","meta");
+    meta.appendChild(el("span",null,"⌖ "+g.place));
+    meta.appendChild(el("span",null,cnt+"/"+g.cap));
+    c.appendChild(meta);
+    var b=el("button","btn sm"+(joined?"":" ghost"), joined?"Joined ✓":"Join gate");
+    b.setAttribute("aria-pressed", joined?"true":"false");
+    b.addEventListener("click",function(){ if(joined) delete S.joined[g.id]; else S.joined[g.id]=1; save(); renderGates(); renderFitGates(); });
+    c.appendChild(b);
+    list.appendChild(c);
   });
 }
 
@@ -1024,11 +1076,6 @@ function renderReroute(){
     var t=el("div","txt"); t.innerHTML="<strong>"+x[0]+"</strong><br>"+x[1];
     row.appendChild(t); br.appendChild(row);
   });
-
-  var cost=document.getElementById("rrCost");
-  cost.innerHTML = r.fee
-    ? "Your "+r.label.split(" — ")[0]+" pass costs <span class=\"mono\" style=\"color:var(--amber-sm)\">AED "+r.fee.toLocaleString()+"</span> a year. At this timetable, <strong>"+Math.round(share*100)+"%</strong> of the campus hours it buys you are hours you did not choose, roughly <span class=\"mono\" style=\"color:var(--amber-sm)\">AED "+(Math.round(r.fee*share/100)*100).toLocaleString()+"</span>. Reroute cannot make the bus come more often; it shows which section swap makes the bus matter less."
-    : "You're not on a bus pass, so your departure is yours to set. What's left is gap time between classes — <strong>"+hrs(wk.mid)+" hours a week</strong> — which is the one kind of dead time a section swap can remove completely.";
 
   var wi=document.getElementById("whatifs"); wi.innerHTML="";
   var any=false;
