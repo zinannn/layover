@@ -10,7 +10,7 @@ RIT Dubai is a commuter campus in Dubai Silicon Oasis, and its commuter buses ru
 
 So a student whose last class ends at 3:10 p.m. does not leave at 3:10. They leave at 6:00. A student whose first class is at 11:00 a.m. arrived on the single morning bus hours earlier. The timetable hands them hours they never chose, at both ends of the day, every week, for four years.
 
-That time isn't rest and it isn't study. It's the worst kind of time — too long to waste, too short to go home, and almost always spent alone, because no student can see which of the other 900 people on campus happens to be stranded in the same window.
+That time isn't rest and it isn't study. It's the worst kind of time — too long to waste, too short to go home, and almost always spent alone, because no student can see which of the hundreds of other students on campus happens to be stranded in the same window.
 
 **2. My Solution**
 

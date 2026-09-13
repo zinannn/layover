@@ -661,7 +661,7 @@ footer strong{color:var(--muted)}
       <p class="lede">Two of these are RIT Dubai&rsquo;s own published operational data, because the mechanism is a published timetable rather than something I had to infer. The third is what the research says the consequence is.</p>
 
       <div style="margin-top:14px">
-        <div class="finding"><div class="big">2</div><div class="txt"><strong>Afternoon bus departures per day</strong> — 3:00 p.m. and 6:00 p.m. only, for every Dubai, Sharjah and Ajman route, all leaving from Parking Lot 3. Abu Dhabi runs four drop-offs (12:30, 2:30, 4:30, 6:00) on a separate contract. Morning service is a <em>single</em> arrival time. This is the mechanism that manufactures the dead hours. <em>(RIT Dubai, Parking &amp; Transportation)</em></div></div>
+        <div class="finding"><div class="big">2</div><div class="txt"><strong>Afternoon bus departures per day</strong> — 3:00 p.m. and 6:00 p.m. only, for every Dubai, Sharjah and Ajman route, all leaving from Parking Lot 3. Abu Dhabi runs four departures (12:30, 2:30, 4:30, 6:00) on a separate contract. Morning service is a <em>single</em> arrival time. This is the mechanism that manufactures the dead hours. <em>(RIT Dubai, Parking &amp; Transportation)</em></div></div>
         <div class="finding"><div class="big">9,900</div><div class="txt"><strong>AED per year for the Ajman round trip</strong> (Sharjah 8,260; Al Barsha 8,960; Deira/Karama 7,440; Qusais and Mirdif 6,480; Abu Dhabi AED 850/month). A seat is bought by the year, so the hours it strands you for are hours already paid for. <em>(RIT Dubai published 2026&ndash;27 fees)</em></div></div>
         <div class="finding"><div class="big">&mdash;</div><div class="txt"><strong>The consequence is documented, not local.</strong> Commuter students report a lower sense of institutional belonging, spend less time on campus outside class, and have less access to informal peer support and societies. Researchers record the same phrase from students repeatedly: having <em>&ldquo;hours to kill in between classes&rdquo;</em> with nowhere to be. <em>(UIC; QMUL; NCWIT)</em></div></div>
       </div>
@@ -697,7 +697,7 @@ footer strong{color:var(--muted)}
       <div class="grid2" style="margin-top:16px">
         <div class="panel stack" style="gap:8px">
           <p class="eyebrow">Reads the real timetable</p>
-          <p style="font-size:.89rem;color:var(--muted)">You enter your classes and pick your actual RIT route. Layover derives your true campus day — morning arrival to bus departure — and isolates three kinds of dead time: the <strong>head</strong> (waiting for your first class), the <strong>middle</strong> (gaps between classes) and the <strong>tail</strong> (last class to the 15:00 or 18:00 bus).</p>
+          <p style="font-size:.89rem;color:var(--muted)">You enter your classes and pick your actual RIT route. Layover derives your true campus day — morning arrival to bus departure — and isolates three kinds of dead time: the <strong>head</strong> (waiting for your first class), the <strong>middle</strong> (gaps between classes) and the <strong>tail</strong> (last class to the 15:00 or 18:00 bus). Sign in and the same week follows you across devices.</p>
         </div>
         <div class="panel stack" style="gap:8px">
           <p class="eyebrow">The Departure Board</p>
@@ -709,7 +709,7 @@ footer strong{color:var(--muted)}
         </div>
         <div class="panel stack" style="gap:8px">
           <p class="eyebrow">Reroute</p>
-          <p style="font-size:.89rem;color:var(--muted)">The part that prevents the problem instead of decorating it. Before registration, test a section swap and see what it does to the shape of the week — campus days, dead hours, and the share of your bus-pass fee spent on hours you didn't choose. <strong>"This swap removes 4.5 dead hours a week and one whole campus day."</strong></p>
+          <p style="font-size:.89rem;color:var(--muted)">The part that prevents the problem instead of decorating it. Before registration, test a section swap and see what it does to the shape of the week — campus days and dead hours. <strong>"This swap removes 4.5 dead hours a week and one whole campus day."</strong></p>
         </div>
         <div class="panel stack" style="gap:8px">
           <p class="eyebrow">People you can actually find</p>
@@ -1413,7 +1413,7 @@ function renderPeople(){
   if(!SIGNED_IN()){
     var s=el("div","stack"); s.style.gap="12px";
     s.appendChild(el("h2","secttl","Sign in to add people"));
-    s.appendChild(el("p","lede","An account keeps your timetable across devices, puts you on the board for other students, and lets you open groups they can join."));
+    s.appendChild(el("p","lede","An account keeps your timetable across devices, puts you on the board for other students, and lets you open gates they can join."));
     var b=el("button","btn","Sign in or create an account");
     b.addEventListener("click",function(){ openAuth(); });
     var bw=el("div"); bw.appendChild(b); s.appendChild(bw);
