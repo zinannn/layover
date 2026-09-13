@@ -125,11 +125,12 @@ nav a[aria-current="page"]{color:var(--text); background:var(--surface-2); borde
 .themebtn:hover{color:var(--text);border-color:var(--muted)}
 
 /* ============ LAYOUT ============ */
-main{max-width:var(--maxw); margin:0 auto; padding:0 20px 96px}
+main{max-width:var(--maxw); margin:0 auto; padding:0 20px 96px; overflow-x:clip}
 section.view{display:none; padding-block:44px 0}
 section.view.on{display:block; animation:fade .3s ease}
 @keyframes fade{from{opacity:0; transform:translateY(5px)}to{opacity:1;transform:none}}
-.stack{display:flex; flex-direction:column; gap:18px}
+.stack{display:flex; flex-direction:column; gap:18px; min-width:0}
+.stack>*,.stack-lg>*,.grid2>*,.grid3>*{min-width:0}
 .stack-lg{display:flex; flex-direction:column; gap:46px}
 .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center}
 .grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(290px,1fr)); gap:16px}
@@ -177,6 +178,7 @@ select{cursor:pointer}
 
 /* ============ THE BOARD ============ */
 .board{
+  max-width:100%;
   background:var(--board); border:1px solid #1E2729; border-radius:var(--r); overflow:hidden;
   box-shadow:var(--shadow);
   background-image:radial-gradient(circle at 1px 1px, rgba(255,255,255,.035) 1px, transparent 0);
@@ -185,7 +187,7 @@ select{cursor:pointer}
 .board-head{display:flex; align-items:center; gap:14px; padding:13px 18px; border-bottom:1px solid #1E2729; flex-wrap:wrap}
 .board-head .t{font-family:var(--font-board); font-size:.68rem; letter-spacing:.2em; text-transform:uppercase; color:#8B9B9C}
 .board-head .amb{color:#FFB000}
-.bwrap{overflow-x:auto}
+.bwrap{overflow-x:auto; max-width:100%}
 table.brd{width:100%; border-collapse:collapse; min-width:680px}
 table.brd th{
   font-family:var(--font-board); font-size:.56rem; letter-spacing:.17em; text-transform:uppercase;
@@ -268,7 +270,7 @@ footer .fi{max-width:var(--maxw); margin:0 auto; display:flex; justify-content:s
   .term-in{min-height:52px; padding-block:8px}
   nav{margin-left:0; width:100%; order:3}
   nav a{padding:6px 8px; font-size:.78rem}
-  .tick{order:2; margin-left:auto}
+  .tick{order:4; width:100%; margin-left:0; padding-top:2px}
   .finding{grid-template-columns:1fr; gap:4px}
   .daystrip{grid-template-columns:38px 1fr}
   .axis{padding-left:48px}
@@ -612,9 +614,9 @@ var COURSES = ["CSCI-141","CSCI-142","MATH-181","MATH-182","PHYS-211","EEEE-281"
 
 /* Seeded students. sched: "Day h:mm-h:mm CODE" */
 var SEED = [
-  {n:"Aisha R.",   m:"Mechanical Eng · Y2", r:"sharjah", q:false, s:["Mon 08:00-09:50 MECE-205","Mon 13:00-14:50 MATH-182","Tue 10:00-11:50 PHYS-211","Wed 08:00-09:50 MECE-205","Wed 14:00-15:10 ESCI-101","Thu 10:00-11:50 PHYS-211"]},
-  {n:"Rayan K.",   m:"Computing Security · Y2", r:"qusais", q:false, s:["Mon 11:00-12:50 CSCI-142","Tue 09:00-10:50 ISTE-230","Tue 14:00-15:10 MGMT-101","Wed 11:00-12:50 CSCI-142","Thu 09:00-10:50 ISTE-230"]},
-  {n:"Mariam H.",  m:"Business · Y3", r:"ajman", q:true,  s:["Mon 09:00-10:50 ACCT-110","Tue 12:00-13:50 MKTG-230","Wed 09:00-10:50 ACCT-110","Wed 14:00-15:10 MGMT-101","Thu 12:00-13:50 MKTG-230"]},
+  {n:"Aisha R.",   m:"Mechanical Eng · Y2", r:"sharjah", q:false, s:["Mon 08:00-09:50 MECE-205","Mon 13:20-15:10 MATH-182","Tue 10:00-11:50 PHYS-211","Wed 08:00-09:50 MECE-205","Wed 14:00-15:10 ESCI-101","Thu 10:00-11:50 PHYS-211"]},
+  {n:"Rayan K.",   m:"Computing Security · Y2", r:"qusais", q:false, s:["Mon 13:00-15:10 CSCI-142","Tue 09:00-10:50 ISTE-230","Tue 14:00-15:10 MGMT-101","Wed 11:00-12:50 CSCI-142","Thu 09:00-10:50 ISTE-230"]},
+  {n:"Mariam H.",  m:"Business · Y3", r:"ajman", q:true,  s:["Mon 09:00-10:50 ACCT-110","Mon 13:30-15:20 MGMT-101","Tue 12:00-13:50 MKTG-230","Wed 09:00-10:50 ACCT-110","Wed 14:00-15:10 MGMT-101","Thu 12:00-13:50 MKTG-230"]},
   {n:"Yusuf A.",   m:"Electrical Eng · Y1", r:"deira", q:false, s:["Mon 10:00-11:50 EEEE-281","Tue 08:00-09:50 MATH-181","Tue 13:00-14:50 PHYS-211","Wed 10:00-11:50 EEEE-281","Thu 08:00-09:50 MATH-181"]},
   {n:"Nikhil S.",  m:"Software Eng · Y3", r:"mirdif", q:false, s:["Mon 14:00-15:50 SWEN-261","Tue 11:00-12:50 CSCI-142","Wed 14:00-15:50 SWEN-261","Thu 11:00-12:50 CSCI-142","Thu 16:00-17:50 ISTE-230"]},
   {n:"Sara M.",    m:"Industrial Eng · Y2", r:"barsha", q:true,  s:["Mon 12:00-13:50 STAT-145","Tue 15:00-16:50 MECE-205","Wed 12:00-13:50 STAT-145","Thu 15:00-16:50 MECE-205"]},
@@ -627,7 +629,7 @@ var SEED = [
   {n:"Abdulla N.", m:"Electrical Eng · Y2", r:"auh", q:false, s:["Mon 09:00-10:50 EEEE-281","Tue 09:00-10:50 MATH-182","Wed 09:00-10:50 EEEE-281","Thu 09:00-10:50 MATH-182"]},
   {n:"Ananya P.",  m:"Industrial Eng · Y1", r:"mirdif", q:true, s:["Mon 12:00-13:50 MATH-181","Tue 08:00-09:50 ENGL-210","Tue 15:00-16:50 STAT-145","Wed 12:00-13:50 MATH-181","Thu 15:00-16:50 STAT-145"]},
   {n:"Tariq E.",   m:"Business · Y2", r:"qusais", q:false, s:["Mon 14:00-15:10 MGMT-101","Tue 10:00-11:50 ACCT-110","Wed 14:00-15:10 MGMT-101","Thu 10:00-11:50 ACCT-110","Thu 16:00-17:50 MKTG-230"]},
-  {n:"Noor J.",    m:"Computing · Y2", r:"sharjah", q:true, s:["Mon 13:00-14:50 CSCI-142","Tue 13:00-14:50 ISTE-230","Wed 13:00-14:50 CSCI-142","Thu 11:00-12:50 SWEN-261"]}
+  {n:"Noor J.",    m:"Computing · Y2", r:"sharjah", q:true, s:["Mon 13:20-15:15 CSCI-142","Tue 13:00-14:50 ISTE-230","Wed 13:00-14:50 CSCI-142","Thu 11:00-12:50 SWEN-261"]}
 ];
 
 var GATES = [
@@ -708,7 +710,7 @@ var S = {
 try{ var raw=localStorage.getItem("layover.v1"); if(raw){ var o=JSON.parse(raw); for(var k in o) S[k]=o[k]; } }catch(e){}
 function save(){ try{ localStorage.setItem("layover.v1", JSON.stringify(S)); }catch(e){} }
 
-var DEMO = ["Mon 09:00-10:50 CSCI-141","Mon 13:00-14:50 MATH-181","Tue 11:00-12:50 PHYS-211","Wed 09:00-10:50 CSCI-141","Wed 14:00-15:10 MGMT-101","Thu 11:00-12:50 PHYS-211","Thu 16:00-17:50 ISTE-230"];
+var DEMO = ["Mon 09:00-10:50 CSCI-141","Mon 14:00-15:10 MGMT-101","Tue 11:00-12:50 PHYS-211","Wed 09:00-10:50 CSCI-141","Wed 13:00-14:50 MATH-181","Thu 11:00-12:50 PHYS-211","Thu 16:00-17:50 ISTE-230"];
 if(!S.classes.length){ S.classes = parseSched(DEMO); S.name = S.name || "You"; }
 
 var PEOPLE = SEED.map(function(p,i){ return {id:"p"+i, n:p.n, m:p.m, r:p.r, q:p.q, classes:parseSched(p.s), place:PLACES[i%PLACES.length]}; });
@@ -806,7 +808,7 @@ function renderBoard(){
   }
 
   document.getElementById("boardCount").textContent = rows.length+" GROUNDED";
-  document.getElementById("boardCtx").textContent = day.toUpperCase()+" "+m2s(t)+"  ·  YOU: "+(myW ? (dur(myW.b-t)+" LEFT, BUS "+(ROUTE[S.route].dep?m2s(myM.depart):"N/A")) : "IN CLASS OR OFF CAMPUS");
+  document.getElementById("boardCtx").textContent = day.toUpperCase()+" "+m2s(t)+"  ·  YOU: "+(myW ? (dur(myW.b-t)+" LEFT, BUS "+(ROUTE[S.route].dep?m2s(myM.depart):"N/A")) : myStatus(myM,t));
 
   /* hero stats */
   var wk=weekModel(S.classes,S.route), r=ROUTE[S.route];
@@ -823,6 +825,13 @@ function renderBoard(){
   });
 }
 
+function myStatus(m,t){
+  if(!m.on) return "NOT ON CAMPUS TODAY";
+  if(m.depart!=null && t>=m.depart) return "GONE — YOU CAUGHT THE "+m2s(m.depart);
+  if(t<m.first) return "NOT ARRIVED YET";
+  for(var i=0;i<m.classes.length;i++){ if(t>=m.classes[i].start && t<m.classes[i].end) return "IN "+m.classes[i].code; }
+  return "BETWEEN CLASSES";
+}
 function select(tr,x,myW){
   var tb=document.getElementById("boardBody");
   Array.prototype.forEach.call(tb.querySelectorAll("tr"),function(r){r.setAttribute("aria-selected","false");});
