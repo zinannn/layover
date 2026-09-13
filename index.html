@@ -1273,8 +1273,15 @@ function renderPeople(){
   if(Cloud.status==="connecting"){ w.appendChild(el("p","lede","Connecting…")); return; }
   if(Cloud.status==="error"){
     var e=el("div","offnote");
-    e.innerHTML="<strong style='color:var(--alert)'>Could not reach the backend.</strong><br>"+
-      (Cloud.error||"")+"<br>The rest of the site carries on with local data.";
+    if(Cloud.needsSchema){
+      e.innerHTML="<strong style='color:var(--text)'>Connected to the project, but its tables are not there yet.</strong><br>"+
+        "Open the Supabase dashboard for this project, go to <strong>SQL Editor &rarr; New query</strong>, paste the whole of "+
+        "<code>schema.sql</code> and press Run. This page becomes real the moment you do &mdash; no redeploy needed.<br>"+
+        "Until then the board, gates and Reroute keep running on local data.";
+    } else {
+      e.innerHTML="<strong style='color:var(--alert)'>Could not reach the backend.</strong><br>"+
+        (Cloud.error||"")+"<br>The rest of the site carries on with local data.";
+    }
     w.appendChild(e); return;
   }
 

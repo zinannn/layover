@@ -114,8 +114,11 @@
       Cloud.status = "ready";
       Cloud.error = null;
     } catch (e) {
+      var msg = (e && e.message) ? e.message : String(e);
+      // connected fine, but schema.sql has not been run against this project yet
+      Cloud.needsSchema = (e && e.code === "PGRST205") || /Could not find the table/i.test(msg);
       Cloud.status = "error";
-      Cloud.error = (e && e.message) ? e.message : String(e);
+      Cloud.error = msg;
     }
     emit();
   }

@@ -4,19 +4,18 @@
    gates and Reroute all work, nothing breaks, nothing is stored anywhere but
    the visitor's own browser.
 
-   Fill them in and the same site becomes multi-user: real accounts, real
-   timetables, real groups, real friends, updating live across devices.
+   Filled in, the same site becomes multi-user: real accounts, real timetables,
+   real groups, real friends, updating live across devices.
 
-   Both values are safe to commit. The anon key is a public client key; every
-   table is protected by row level security policies in schema.sql, so what a
-   visitor can read or write is decided by the database, not by this file.
+   Both values are safe to commit. This is a publishable client key; it grants
+   nothing on its own. What any visitor can read or write is decided by the
+   row level security policies in schema.sql, enforced by Postgres.
 
-   Where to find them:
-     Supabase dashboard → your project → Settings → API
-       url     = Project URL
-       anonKey = Project API keys → anon / public
+   Never put the secret / service_role key here — that one bypasses every policy.
+
+   Supabase dashboard → Settings → API Keys
 */
 window.LAYOVER_CONFIG = {
-  url: "",
-  anonKey: ""
+  url:     "https://fcuhxzkfpjgtyjwcziwv.supabase.co",
+  anonKey: "sb_publishable_5dAfnDEEVcZqt7l3-jMOiA_LEt0wHcW"
 };
