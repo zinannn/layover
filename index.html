@@ -252,6 +252,29 @@ table.brd tbody tr[aria-selected="true"]{background:rgba(255,176,0,.09)}
 .seg .lbl{position:absolute; inset:0; display:grid; place-items:center; font-family:var(--font-board); font-size:.55rem; color:var(--text); letter-spacing:.05em}
 .axis{display:flex; justify-content:space-between; font-family:var(--font-board); font-size:.55rem; color:var(--dim); letter-spacing:.08em; padding-left:56px}
 
+/* ============ WAYS HOME (RTA) ============ */
+.ways{border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.way{display:grid; grid-template-columns:62px 1fr auto; gap:14px; align-items:center; padding:12px 16px; border-bottom:1px solid var(--line-soft)}
+.way:last-child{border-bottom:0}
+.way-no{font-family:var(--font-board); font-size:.84rem; font-weight:700; color:var(--amber-sm); letter-spacing:.02em}
+.way-to{font-size:.88rem; font-weight:600}
+.way-sub{font-size:.76rem; color:var(--muted); line-height:1.4}
+.way-freq{font-family:var(--font-board); font-size:.72rem; color:var(--text); text-align:right; font-variant-numeric:tabular-nums}
+.way-freq small{display:block; font-size:.58rem; color:var(--dim); letter-spacing:.1em; text-transform:uppercase; margin-top:2px}
+.wayfoot{padding:11px 16px; font-size:.76rem; color:var(--muted); background:var(--surface-2); line-height:1.5}
+.wayfoot a{color:var(--amber-sm)}
+@media (max-width:560px){ .way{grid-template-columns:52px 1fr; row-gap:6px} .way-freq{grid-column:2; text-align:left} }
+
+/* ============ OPEN A GATE ============ */
+.opener{border:1px solid var(--line); border-radius:var(--r); background:var(--surface); padding:18px; display:flex; flex-direction:column; gap:14px}
+.opener .grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:10px}
+.opener .grid .wide{grid-column:span 2}
+@media (max-width:560px){ .opener .grid .wide{grid-column:span 1} }
+.opener .verdict{font-size:.82rem; line-height:1.45; padding:10px 12px; border-radius:7px; background:var(--surface-2); color:var(--muted)}
+.opener .verdict.ok{background:var(--go-soft); color:var(--go)}
+.opener .verdict.bad{background:var(--alert-soft); color:var(--alert)}
+.gate.mine{border-left:3px solid var(--amber); padding-left:16px}
+
 /* ============ GATES ============ */
 .gate{background:var(--surface); border:1px solid var(--line); border-radius:var(--r); padding:18px; display:flex; flex-direction:column; gap:11px; align-items:stretch}
 .gate>.btn{align-self:flex-start}
@@ -389,6 +412,11 @@ footer strong{color:var(--muted)}
     </div>
     <p class="mini" id="boardNote">Students shown are seeded examples, so the board is never empty.</p>
 
+    <div class="stack" style="margin-top:30px; gap:12px" id="waysWrap">
+      <h2 class="secttl" id="waysTitle">If you would rather not wait</h2>
+      <div class="ways" id="waysHome"></div>
+    </div>
+
     <div class="stack" style="margin-top:30px; gap:12px">
       <h2 class="secttl" id="fitTitle">Gates in this window</h2>
       <div class="grid3" id="fitGates"></div>
@@ -399,9 +427,42 @@ footer strong{color:var(--muted)}
 
 <!-- ===================== GATES ===================== -->
 <section class="view" id="v-/gates" aria-label="Gates">
-  <div class="row" style="margin:6px 0 16px; justify-content:space-between">
+  <div class="opener" style="margin-top:6px">
+    <div class="row" style="justify-content:space-between">
+      <h2 class="secttl">Open a gate</h2>
+      <button class="btn ghost sm" id="gPrefill">Use my window</button>
+    </div>
+    <label class="f">What is it
+      <input type="text" id="gTitle" placeholder="e.g. STAT-145 past paper, together">
+    </label>
+    <div class="grid">
+      <label class="f">Kind
+        <select id="gType">
+          <option value="study">Study</option>
+          <option value="coop">Co-op</option>
+          <option value="move">Move</option>
+          <option value="quiet">Quiet</option>
+        </select>
+      </label>
+      <label class="f wide">Where
+        <select id="gPlace"></select>
+      </label>
+      <label class="f">Day <select id="gDay"></select></label>
+      <label class="f">From <input type="time" id="gStart" value="15:10"></label>
+      <label class="f">Until <input type="time" id="gEnd" value="16:40"></label>
+      <label class="f">Places <input type="text" id="gCap" value="6" inputmode="numeric"></label>
+    </div>
+    <div class="verdict" id="gVerdict">Set a time and Layover will check it against your window and your bus.</div>
+    <div class="row">
+      <button class="btn sm" id="gCreate">Open the gate</button>
+      <span class="mini" id="gMineCount"></span>
+    </div>
+  </div>
+
+  <div class="row" style="margin:22px 0 16px; justify-content:space-between">
     <div class="chipset" role="group" aria-label="Filter gates">
       <button class="chip" data-g="all" aria-pressed="true">All</button>
+      <button class="chip" data-g="mine">Mine</button>
       <button class="chip" data-g="fits" aria-pressed="false">Fits my layover</button>
       <button class="chip" data-g="study">Study</button>
       <button class="chip" data-g="coop">Co-op</button>
@@ -645,6 +706,22 @@ var SEED = [
   {n:"Noor J.",    m:"Computing · Y2", r:"sharjah", q:true, s:["Mon 13:20-15:15 CSCI-142","Tue 13:00-14:50 ISTE-230","Wed 13:00-14:50 CSCI-142","Thu 11:00-12:50 SWEN-261"]}
 ];
 
+/* RTA routes verified as serving the Silicon Oasis HQ stops. Times and headways are
+   published scheduled service, not live positions - Dubai Pulse gates its GTFS feed
+   behind an API key, which a static site cannot hold. Anything unverified is listed
+   as a route number only rather than given an invented timetable. */
+var RTA = {
+  stop: "Silicon Oasis HQ / Sit Tower 1",
+  routes: [
+    {no:"X25", to:"Al Karama", detail:"45–60 min · AED 5 with a Silver Nol",
+     freq:"every 20–30 min", span:"05:30 – 23:00 Mon–Thu"},
+    {no:"320", to:"Rashidiya Metro Station", detail:"Connects to the Red Line for the rest of the city",
+     freq:"every ~20 min", span:"Daily service"}
+  ],
+  also: ["36A","36B","50","366"],
+  planner: "https://www.rta.ae/wps/portal/rta/ae/public-transport/journey-planner"
+};
+
 var GATES = [
   {id:"g1", code:"GATE 1",  t:"study", title:"MATH-181 problem set, together",   place:"Library L1 — group tables", day:"Mon", a:"15:10", b:"16:40", host:"Omar B.", cap:6,  join:4, tags:["Study","MATH-181"], d:"Bring the question you are stuck on. Nobody teaches, everyone works."},
   {id:"g2", code:"GATE 2",  t:"coop",  title:"Co-op mock interview — 20 min each",place:"Co-op office corridor", day:"Tue", a:"15:20", b:"17:00", host:"Mariam H.", cap:8, join:6, tags:["Co-op","Careers"], d:"Two chairs, one timer, questions from last year's placements."},
@@ -717,7 +794,7 @@ function weekModel(classes, routeId){
 
 /* ================= STATE ================= */
 var S = {
-  name:"", route:"qusais", classes:[], joined:{}, filters:{mine:true,route:false,course:false,quiet:false},
+  name:"", route:"qusais", classes:[], joined:{}, mine:[], filters:{mine:true,route:false,course:false,quiet:false},
   gateFilter:"all", vDay:"Mon", vTime:930, follow:true
 };
 try{ var raw=localStorage.getItem("layover.v1"); if(raw){ var o=JSON.parse(raw); for(var k in o) S[k]=o[k]; } }catch(e){}
@@ -725,6 +802,9 @@ function save(){ try{ localStorage.setItem("layover.v1", JSON.stringify(S)); }ca
 
 var DEMO = ["Mon 09:00-10:50 CSCI-141","Mon 14:00-15:10 MGMT-101","Tue 11:00-12:50 PHYS-211","Wed 09:00-10:50 CSCI-141","Wed 13:00-14:50 MATH-181","Thu 11:00-12:50 PHYS-211","Thu 16:00-17:50 ISTE-230"];
 if(!S.classes.length){ S.classes = parseSched(DEMO); S.name = S.name || "You"; }
+
+if(!Array.isArray(S.mine)) S.mine=[];
+function allGates(){ return GATES.concat(S.mine); }
 
 var PEOPLE = SEED.map(function(p,i){ return {id:"p"+i, n:p.n, m:p.m, r:p.r, q:p.q, classes:parseSched(p.s), place:PLACES[i%PLACES.length]}; });
 
@@ -827,6 +907,7 @@ function renderBoard(){
   GROUNDED_NOW = rows.length;
   renderDep();
   renderFitGates();
+  renderWays();
 }
 
 /* The one thing a student opens this for: when the bus goes and how long they have. */
@@ -873,7 +954,7 @@ function renderFitGates(){
   var day=S.vDay, t=S.vTime, m=dayModel(S.classes,S.route,day);
   var list=document.getElementById("fitGates"); list.innerHTML="";
   var hits=[];
-  GATES.forEach(function(g){
+  allGates().forEach(function(g){
     if(g.day!==day) return;
     var a=s2m(g.a), b=s2m(g.b);
     if(b<=t+10) return;
@@ -928,11 +1009,39 @@ function select(tr,x,myW){
     : '<strong style="color:var(--text)">'+x.p.n+'</strong> — only <span class="mono">'+dur(ov)+'</span> of overlap. Layover won\'t pretend that\'s a match: by the time you walked to the '+x.p.place.toLowerCase()+', one of you would be leaving.';
 }
 
+/* ================= WAYS HOME ================= */
+function renderWays(){
+  var day=S.vDay, t=S.vTime, r=ROUTE[S.route];
+  var m=dayModel(S.classes,S.route,day);
+  var wait = (r.dep && m.on && m.depart!=null) ? m.depart-t : 0;
+  document.getElementById("waysTitle").textContent =
+    wait>=90 ? "You do not have to wait "+dur(wait)+" for the RIT bus" : "Public transport from campus";
+
+  var box=document.getElementById("waysHome"); box.innerHTML="";
+  RTA.routes.forEach(function(x){
+    var row=el("div","way");
+    row.appendChild(el("div","way-no",x.no));
+    var mid=el("div");
+    mid.appendChild(el("div","way-to","to "+x.to));
+    mid.appendChild(el("div","way-sub",x.detail));
+    row.appendChild(mid);
+    var f=el("div","way-freq",x.freq);
+    f.appendChild(el("small",null,x.span));
+    row.appendChild(f);
+    box.appendChild(row);
+  });
+  var foot=el("div","wayfoot");
+  foot.innerHTML="From <strong>"+RTA.stop+"</strong>. Routes "+RTA.also.join(", ")+" also stop here. "+
+    "These are RTA&rsquo;s published frequencies, not live running times &mdash; check the "+
+    "<a href=\""+RTA.planner+"\" target=\"_blank\" rel=\"noopener\">RTA journey planner</a> or the S&rsquo;hail app before you go.";
+  box.appendChild(foot);
+}
+
 /* ================= GATES ================= */
 function renderGates(){
   var list=document.getElementById("gateList"); list.innerHTML="";
   var shown=0;
-  GATES.forEach(function(g){
+  allGates().forEach(function(g){
     var a=s2m(g.a), b=s2m(g.b);
     var m=dayModel(S.classes,S.route,g.day);
     var fitMin=0, clash=false, missBus=false;
@@ -942,18 +1051,19 @@ function renderGates(){
     var fits = fitMin >= Math.min(40,(b-a)*0.6) && !clash && !missBus;
 
     if(S.gateFilter==="fits" && !fits) return;
-    if(S.gateFilter!=="all" && S.gateFilter!=="fits" && g.t!==S.gateFilter) return;
+    if(S.gateFilter==="mine" && !g.mine) return;
+    if(S.gateFilter!=="all" && S.gateFilter!=="fits" && S.gateFilter!=="mine" && g.t!==S.gateFilter) return;
     shown++;
 
     var joined = !!S.joined[g.id];
     var n = g.join + (joined?1:0);
     var full = n>=g.cap && !joined;
 
-    var c=el("div","gate "+(fits?"fits":"")+(clash||missBus?" clash":""));
+    var c=el("div","gate "+(g.mine?"mine ":"")+(fits&&!g.mine?"fits":"")+(clash||missBus?" clash":""));
     var gh=el("div","gh");
     var L=el("div"); L.appendChild(el("div","code",g.code+" · "+g.day)); L.appendChild(el("h3",null,g.title));
     var R=el("div","when",g.a+"–"+g.b); gh.appendChild(L); gh.appendChild(R); c.appendChild(gh);
-    c.appendChild(el("p",null,g.d));
+    if(g.d) c.appendChild(el("p",null,g.d));
 
     var meta=el("div","meta");
     meta.appendChild(el("span",null,"⌖ "+g.place));
@@ -977,11 +1087,55 @@ function renderGates(){
     var btn=el("button","btn sm"+(joined?"":" ghost"), joined?"Joined ✓":(full?"Join waitlist":"Join gate"));
     btn.setAttribute("aria-pressed", joined?"true":"false");
     btn.addEventListener("click",function(){ if(joined) delete S.joined[g.id]; else S.joined[g.id]=1; save(); renderGates(); });
-    foot.appendChild(btn); c.appendChild(foot);
+    foot.appendChild(btn);
+    if(g.mine){
+      var del=el("button","btn sm ghost","Close gate");
+      del.addEventListener("click",function(){
+        S.mine=S.mine.filter(function(z){return z.id!==g.id;});
+        delete S.joined[g.id]; save(); renderGates(); renderFitGates(); updateMineCount();
+      });
+      foot.appendChild(del);
+    }
+    c.appendChild(foot);
     list.appendChild(c);
   });
   document.getElementById("gateCount").textContent = shown+" gate"+(shown===1?"":"s")+" · "+Object.keys(S.joined).length+" joined";
   if(!shown) list.appendChild(el("p","lede","No gates match that filter. Clear it, or open a new gate in the window you have."));
+}
+
+/* ================= OPEN A GATE ================= */
+function gateCheck(day,a,b){
+  var m=dayModel(S.classes,S.route,day), fit=0, clash=false, missBus=false;
+  m.windows.forEach(function(w){ fit=Math.max(fit, overlapMin(w.a,w.b,a,b)); });
+  m.classes.forEach(function(c){ if(overlapMin(c.start,c.end,a,b)>0) clash=true; });
+  if(ROUTE[S.route].dep && m.depart!=null && b>m.depart) missBus=true;
+  return {m:m, fit:fit, clash:clash, missBus:missBus};
+}
+function gVal(id,d){ var e=document.getElementById(id); return e && e.value ? e.value : d; }
+function updateVerdict(){
+  var v=document.getElementById("gVerdict"); if(!v) return;
+  var day=gVal("gDay","Mon"), a=s2m(gVal("gStart","15:10")), b=s2m(gVal("gEnd","16:40"));
+  v.className="verdict";
+  if(b<=a){ v.classList.add("bad"); v.textContent="The end time has to be after the start time."; return; }
+  var c=gateCheck(day,a,b);
+  if(!c.m.on){ v.textContent="You have no classes on "+day+", so this sits outside your own week. You can still host it."; return; }
+  if(c.clash){ v.classList.add("bad"); v.textContent="That runs through one of your own classes on "+day+"."; return; }
+  if(c.missBus){ v.classList.add("bad"); v.textContent="That ends after your "+m2s(c.m.depart)+" bus, so you would have to leave before it finishes."; return; }
+  if(c.fit<20){ v.textContent="Only "+dur(c.fit)+" of this falls inside your own free window on "+day+"."; return; }
+  v.classList.add("ok"); v.textContent="Fits "+dur(c.fit)+" of your window on "+day+", and ends before your bus.";
+}
+function updateMineCount(){
+  var e=document.getElementById("gMineCount"); if(!e) return;
+  e.textContent = S.mine.length ? S.mine.length+" open"+(S.mine.length===1?"":"") : "";
+}
+function prefillGate(){
+  var m=dayModel(S.classes,S.route,S.vDay), w=activeWindow(m,S.vTime)||m.windows[m.windows.length-1];
+  document.getElementById("gDay").value=S.vDay;
+  if(w){
+    document.getElementById("gStart").value=m2s(Math.max(w.a,S.vTime));
+    document.getElementById("gEnd").value=m2s(w.b);
+  }
+  updateVerdict();
 }
 
 /* ================= MY DAY ================= */
@@ -1104,7 +1258,7 @@ function renderReroute(){
 }
 
 /* ================= WIRING ================= */
-function renderAll(){ renderBoard(); renderGates(); renderStrips(); renderSched(); renderRouteNote(); renderReroute(); tickClock(); }
+function renderAll(){ renderBoard(); renderGates(); renderStrips(); renderSched(); renderRouteNote(); renderReroute(); updateMineCount(); tickClock(); }
 
 function route(){
   var h=location.hash.replace(/^#/,"")||"/";
@@ -1126,6 +1280,25 @@ DAYS.forEach(function(d){ var o=el("option",null,d); o.value=d; vd.appendChild(o
 var mr=document.getElementById("myRoute");
 ROUTES.forEach(function(r){ var o=el("option",null,r.label+(r.fee?"  ·  AED "+r.fee.toLocaleString()+"/yr":"")); o.value=r.id; mr.appendChild(o); });
 var dl=document.getElementById("courseList"); COURSES.forEach(function(c){ var o=el("option"); o.value=c; dl.appendChild(o); });
+var gd=document.getElementById("gDay"); DAYS.forEach(function(d){ var o=el("option",null,d); o.value=d; gd.appendChild(o); });
+var gp=document.getElementById("gPlace"); PLACES.forEach(function(pl){ var o=el("option",null,pl); o.value=pl; gp.appendChild(o); });
+["gDay","gStart","gEnd"].forEach(function(id){ document.getElementById(id).addEventListener("change",updateVerdict); });
+document.getElementById("gPrefill").addEventListener("click",prefillGate);
+document.getElementById("gCreate").addEventListener("click",function(){
+  var title=(gVal("gTitle","")).trim();
+  if(!title){ document.getElementById("gTitle").focus(); return; }
+  var day=gVal("gDay","Mon"), a=s2m(gVal("gStart","15:10")), b=s2m(gVal("gEnd","16:40"));
+  if(b<=a){ document.getElementById("gEnd").focus(); return; }
+  var cap=Math.max(2, Math.min(40, parseInt(gVal("gCap","6"),10)||6));
+  var type=gVal("gType","study");
+  var id="m"+Date.now();
+  S.mine.push({ id:id, code:"YOUR GATE", t:type, title:title, place:gVal("gPlace",PLACES[0]),
+    day:day, a:m2s(a), b:m2s(b), host:(S.name||"You"), cap:cap, join:0,
+    tags:[type.charAt(0).toUpperCase()+type.slice(1),"Open to all"], d:"", mine:true });
+  S.joined[id]=1;
+  document.getElementById("gTitle").value="";
+  save(); renderGates(); renderFitGates(); updateMineCount(); updateVerdict();
+});
 
 var snap=snapToCampus(); if(S.follow){ S.vDay=snap.day; S.vTime=snap.min; }
 vd.value=S.vDay; document.getElementById("vTime").value=m2s(S.vTime);
@@ -1177,7 +1350,7 @@ tb.addEventListener("click",function(){
 });
 if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) document.body.classList.add("no-motion");
 
-route(); renderAll(); setInterval(tickClock,20000);
+route(); renderAll(); updateVerdict(); setInterval(tickClock,20000);
 </script>
 </body>
 </html>
