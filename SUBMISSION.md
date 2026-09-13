@@ -23,9 +23,12 @@ Layover computes the window in which a meeting is physically possible, and build
 - **The Departure Board** — a live terminal board of everyone currently grounded, showing how long they're free, where they are, which bus they're on, and the exact **overlap in minutes** with your window. Under twenty minutes, it says so instead of pretending it's a match.
 - **Gates** — plans sized to a layover rather than events you have to leave early: a study block for a course you share, a co-op mock interview, a gym slot, and a **Quiet Gate** for students who want company without conversation. Each one is checked against your window *and* your bus before you can join.
 - **My Day** — your true campus day, separating the three kinds of dead time: the morning wait, the gaps between classes, and the tail before departure.
-- **Reroute** — the part that prevents the problem instead of decorating it. Before registration, test a section swap and see what it does to the shape of your week — campus days, dead hours, and the share of your AED 6,480–9,900 bus pass spent on hours you didn't choose.
+- **Reroute** — the part that prevents the problem instead of decorating it. Before registration, test a section swap and see what it does to the shape of your week: how many days you must be on campus, and how many dead hours the bus schedule adds on top.
+- **Ways home** — the RIT bus is not the only option. Layover shows the RTA routes from the Silicon Oasis HQ stops, so being stranded until 18:00 is a choice rather than a sentence.
 
-Everything runs in the browser. No account, no server, and no timetable leaves your device.
+**It is a real platform, not a mockup.** Create an account and your timetable follows you across devices; open a group and other students can genuinely join it; add friends and filter the board to just them. It updates live — open it on two devices and a group opened on one appears on the other without a refresh.
+
+You appear on the board only if you tick "Show me on the board". Every table is protected by row-level security in the database: you can only edit your own profile and timetable, only join a group as yourself, only close a group you host, and a friendship is visible only to the two people in it.
 
 **3. Project Link**
 
