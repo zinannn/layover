@@ -197,6 +197,23 @@ select{cursor:pointer}
 .tag.amb{background:var(--amber-soft); color:var(--amber); border-color:transparent}
 .tag.red{background:var(--alert-soft); color:var(--alert); border-color:transparent}
 
+/* ============ ACCOUNT MENU ============ */
+.acct{position:relative; display:inline-block}
+.acct-menu{
+  position:absolute; right:0; top:calc(100% + 7px); min-width:214px; z-index:60;
+  background:var(--surface); border:1px solid var(--line); border-radius:9px;
+  box-shadow:var(--shadow); padding:6px; display:flex; flex-direction:column; gap:1px;
+}
+.acct-who{padding:8px 10px 9px; border-bottom:1px solid var(--line-soft); margin-bottom:4px}
+.acct-who b{display:block; font-size:.88rem; font-weight:600}
+.acct-who span{font-size:.71rem; color:var(--dim); word-break:break-all}
+.acct-menu a,.acct-menu button{
+  display:block; width:100%; text-align:left; background:none; border:0; cursor:pointer;
+  font:inherit; font-size:.85rem; color:var(--text); padding:8px 10px; border-radius:6px; text-decoration:none;
+}
+.acct-menu a:hover,.acct-menu button:hover{background:var(--surface-2)}
+.acct-menu .out{color:var(--alert)}
+
 /* ============ AUTH MODAL ============ */
 .modal{position:fixed; inset:0; z-index:80; display:grid; place-items:center; padding:20px;
   background:color-mix(in srgb, #05090A 72%, transparent); backdrop-filter:blur(3px)}
@@ -385,7 +402,10 @@ footer strong{color:var(--muted)}
       <a href="#/reroute" data-r="/reroute">Reroute</a>
       <a href="#/problem-solution" data-r="/problem-solution">Problem &amp; Solution</a>
     </nav>
-    <button class="btn ghost sm" id="authBtn" hidden>Sign in</button>
+    <span class="acct" id="acctWrap">
+      <button class="btn ghost sm" id="authBtn" hidden aria-haspopup="menu" aria-expanded="false">Sign in</button>
+      <div class="acct-menu" id="acctMenu" hidden role="menu" aria-labelledby="authBtn"></div>
+    </span>
     <button class="themebtn" id="themeBtn" title="Switch theme" aria-label="Switch colour theme">◑</button>
   </div>
 </header>
@@ -1027,8 +1047,13 @@ function renderDep(){
   }
 
   if(!m.on){
-    cell("Next departure","No bus","You have no classes on "+day+".",true);
-    cell("Your window","—","Pick a day you are on campus.",true);
+    if(!S.classes.length){
+      cell("Your timetable","Empty","Add your classes in My Day and this becomes your real day.",true);
+      cell("Why it matters","—","Layover works out when you actually get to leave, not when class ends.",true);
+    } else {
+      cell("Next departure","No bus","You have no classes on "+day+".",true);
+      cell("Your window","—","Pick a day you are on campus.",true);
+    }
     cell("Grounded with you",String(GROUNDED_NOW),"students free at "+m2s(t)+".");
     return;
   }
@@ -1372,13 +1397,38 @@ function openAuth(msg){
   setTimeout(function(){ document.getElementById("auEmail").focus(); },30);
 }
 function closeAuth(){ document.getElementById("authModal").hidden=true; }
+function closeAcct(){
+  var m=document.getElementById("acctMenu");
+  if(m) m.hidden=true;
+  var b=document.getElementById("authBtn"); if(b) b.setAttribute("aria-expanded","false");
+}
+function toggleAcct(){
+  var m=document.getElementById("acctMenu");
+  if(!m.hidden){ closeAcct(); return; }
+  m.innerHTML="";
+  var who=el("div","acct-who");
+  who.appendChild(el("b",null,Cloud.me.display_name||"Your account"));
+  var em=(Cloud.session && Cloud.session.user) ? Cloud.session.user.email : "";
+  if(em) who.appendChild(el("span",null,em));
+  m.appendChild(who);
+  [["My timetable","#/day"],["People and friends","#/people"]].forEach(function(it){
+    var a=el("a",null,it[0]); a.href=it[1]; a.setAttribute("role","menuitem");
+    a.addEventListener("click",closeAcct); m.appendChild(a);
+  });
+  var out=el("button","out","Sign out"); out.setAttribute("role","menuitem");
+  out.addEventListener("click",function(){ closeAcct(); Cloud.signOut(); });
+  m.appendChild(out);
+  m.hidden=false;
+  document.getElementById("authBtn").setAttribute("aria-expanded","true");
+}
 function setVal(id,v){ var e=document.getElementById(id); if(e && v!=null) e.value=v; }
 function updateAuthUI(){
   var b=document.getElementById("authBtn"), cf=document.getElementById("chipFriends");
   if(!b) return;
   if(!window.Cloud || !Cloud.enabled){ b.hidden=true; if(cf) cf.hidden=true; return; }
   b.hidden=false;
-  b.textContent = SIGNED_IN() ? (Cloud.me.display_name || "Account") : "Sign in";
+  b.textContent = SIGNED_IN() ? ((Cloud.me.display_name || "Account") + " ▾") : "Sign in";
+  if(!SIGNED_IN()) closeAcct();
   if(cf) cf.hidden = !SIGNED_IN();
   if(SIGNED_IN()){
     setVal("myName",Cloud.me.display_name); setVal("myMajor",Cloud.me.major);
@@ -1645,9 +1695,14 @@ document.getElementById("tabIn").addEventListener("click",function(){ setAuthMod
 document.getElementById("tabUp").addEventListener("click",function(){ setAuthMode("up"); });
 document.getElementById("auClose").addEventListener("click",closeAuth);
 document.getElementById("authModal").addEventListener("click",function(e){ if(e.target===this) closeAuth(); });
-document.addEventListener("keydown",function(e){ if(e.key==="Escape") closeAuth(); });
-document.getElementById("authBtn").addEventListener("click",function(){
-  if(SIGNED_IN()) Cloud.signOut(); else openAuth();
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ closeAuth(); closeAcct(); } });
+document.getElementById("authBtn").addEventListener("click",function(e){
+  e.stopPropagation();
+  if(SIGNED_IN()) toggleAcct(); else openAuth();
+});
+document.addEventListener("click",function(e){
+  var w=document.getElementById("acctWrap");
+  if(w && !w.contains(e.target)) closeAcct();
 });
 document.getElementById("auGo").addEventListener("click",function(){
   var mm=document.getElementById("auMsg");
